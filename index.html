@@ -3,14 +3,509 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Earn Millions - Invite & Earn</title>
+  <title>Share254 - Connect & Earn</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
-    body { background: #f1f5f9; color: #0f172a; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 15px; }
-    
-    .card { background: #ffffff; width: 100%; max-width: 440px; padding: 25px 20px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px rgba(0,0,0,0.06); text-align: center; position: relative; overflow: hidden; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, -apple-system, sans-serif; }
+    body { background: #f8fafc; color: #0f172a; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding-bottom: 40px; }
 
-    /* Custom Notification Banner */
+    /* TOP NAVIGATION BAR */
+    .top-navbar {
+      width: 100%;
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .brand-logo-container { display: flex; align-items: center; gap: 10px; }
+    .brand-logo-svg { height: 36px; width: auto; display: flex; align-items: center; }
+    .brand-logo-svg svg { height: 36px; width: 36px; }
+    .brand-title-text { font-size: 20px; font-weight: 900; color: #0f172a; letter-spacing: -0.5px; }
+
+    /* USER DROPDOWN */
+    .user-dropdown { position: relative; display: inline-block; }
+    .user-nickname-btn { background: #f1f5f9; color: #0f172a; border: 1px solid #cbd5e1; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+    .user-nickname-btn:hover { background: #e2e8f0; }
+    .dropdown-content { display: none; position: absolute; right: 0; top: 35px; background-color: #ffffff; border: 1px solid #cbd5e1; min-width: 130px; box-shadow: 0px 8px 16px rgba(0,0,0,0.1); border-radius: 8px; z-index: 10; text-align: left; overflow: hidden; }
+    .dropdown-content a { color: #0f172a; padding: 10px 14px; text-decoration: none; display: block; font-size: 13px; font-weight: bold; }
+    .dropdown-content a:hover { background-color: #fee2e2; color: #dc2626; }
+
+    /* MAIN CONTAINER */
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* CARD COMPONENT */
+    .card {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      padding: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    }
+
+    /* COLLAPSIBLE HOW IT WORKS / CHATROOM CARD */
+    .header-card-collapsible {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      border-left: 4px solid #0066FF;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+      transition: all 0.3s ease;
+    }
+    .header-card-toggle {
+      width: 100%;
+      padding: 16px 20px;
+      background: transparent;
+      border: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      text-align: left;
+    }
+    .header-card-toggle h2 {
+      font-size: 16px;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.3;
+      padding-right: 10px;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    /* DASHBOARD ACTION BUTTON (CHATROOM) */
+    .dashboard-action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #0066FF;
+      padding: 6px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .dashboard-action-btn:hover {
+      background: #dbeafe;
+      border-color: #93c5fd;
+    }
+    .dashboard-action-btn .icon { font-size: 16px; }
+    .dashboard-action-btn .label {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+
+    .header-icon-arrow {
+      font-size: 12px;
+      color: #0066FF;
+      transition: transform 0.3s ease;
+      flex-shrink: 0;
+    }
+    .header-card-collapsible.open .header-icon-arrow {
+      transform: rotate(180deg);
+    }
+    .header-card-body {
+      max-height: 0;
+      overflow: hidden;
+      padding: 0 20px;
+      transition: max-height 0.3s cubic-bezier(0, 1, 0, 1), padding 0.3s ease;
+    }
+    .header-card-collapsible.open .header-card-body {
+      max-height: 500px;
+      padding: 0 20px 18px 20px;
+      transition: max-height 0.4s ease-in-out, padding 0.3s ease;
+    }
+    .header-card-body p.fomo-text {
+      font-size: 13px;
+      color: #475569;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    .math-breakdown {
+      border-top: 1px dashed #cbd5e1;
+      padding-top: 10px;
+      font-size: 13px;
+      color: #334155;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    /* STATUS BANNER */
+    .status-banner { background: #fef3c7; border: 1px solid #fde68a; color: #92400e; padding: 8px 12px; font-size: 12px; border-radius: 8px; font-weight: bold; text-align: center; }
+    .status-banner.active { background: #dcfce7; border-color: #bbf7d0; color: #166534; }
+
+    /* STATS BOX */
+    .stats-box { background: #f0f7ff; border: 1px solid #bae6fd; padding: 16px; border-radius: 14px; text-align: center; }
+    .stats-box span { font-size: 11px; color: #0284c7; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; display: block; }
+    .stats-box h3 { font-size: 32px; color: #0066FF; font-weight: 900; margin-top: 2px; }
+
+    /* LOCKED CODE BOX */
+    .hidden-code-container { text-align: left; background: #fffbeb; border: 1px dashed #f59e0b; padding: 14px; border-radius: 12px; position: relative; cursor: pointer; }
+    .hidden-code-container label { font-size: 11px; color: #b45309; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 6px; }
+    .blur-wrapper { position: relative; width: 100%; border-radius: 8px; overflow: hidden; background: #e2e8f0; border: 1px solid #cbd5e1; }
+    .blur-target { filter: blur(6px); user-select: none; padding: 12px; font-size: 14px; font-weight: 900; color: #0f172a; letter-spacing: 1px; text-align: center; background: #cbd5e1; pointer-events: none; transition: filter 0.4s ease; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .blur-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.55); display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; backdrop-filter: blur(1px); transition: 0.2s; }
+    .blur-overlay:hover { background: rgba(15, 23, 42, 0.65); }
+    .blur-overlay span { color: #ffffff; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+
+    /* ALWAYS VISIBLE UNLOCKED SHARE & COPY CARD */
+    .share-box-card {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 14px;
+      padding: 16px;
+      text-align: left;
+    }
+    .share-box-card label {
+      font-size: 12px;
+      color: #15803d;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: block;
+      margin-bottom: 8px;
+    }
+    .share-box-card textarea { width: 100%; height: 75px; background: #ffffff; border: 1px solid #cbd5e1; color: #0f172a; border-radius: 8px; padding: 8px 10px; font-size: 12px; resize: none; font-family: inherit; margin-bottom: 8px; outline: none; }
+    .share-actions { display: flex; gap: 8px; }
+    .share-actions button { flex: 1; margin-bottom: 0; }
+
+    /* BUTTONS */
+    .btn { background: #0066FF; color: #ffffff; border: none; padding: 14px; font-size: 14px; font-weight: 800; border-radius: 10px; cursor: pointer; width: 100%; text-transform: uppercase; transition: 0.2s; line-height: 1.3; }
+    .btn:hover { background: #0052cc; }
+
+    /* EYE-CATCHING BOLD ACTION BUTTONS */
+    .btn-eyecatch {
+      font-size: 16px !important;
+      font-weight: 900 !important;
+      letter-spacing: 0.8px;
+      padding: 16px 20px !important;
+      border-radius: 12px !important;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-green-pay {
+      background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important;
+      color: #ffffff !important;
+    }
+
+    .btn-green-pay:hover {
+      background: linear-gradient(135deg, #15803d 0%, #166534 100%) !important;
+    }
+
+    .btn-highlight-glow { 
+      animation: eyeCatchGlow 1.8s infinite ease-in-out; 
+    }
+
+    @keyframes eyeCatchGlow {
+      0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.6); transform: scale(1); }
+      50% { box-shadow: 0 0 20px 6px rgba(22, 163, 74, 0.45); transform: scale(1.02); }
+      100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); transform: scale(1); }
+    }
+
+    .btn-secondary { background: #f59e0b; color: #ffffff; }
+    .btn-secondary:hover { background: #d97706; }
+    .btn-share { background: #16a34a; color: #ffffff; }
+    .btn-share:hover { background: #15803d; }
+
+    /* NETWORK INVITES LIST */
+    .invite-section { text-align: left; }
+    .invite-section h4 { font-size: 12px; color: #64748b; margin-bottom: 10px; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center; }
+    ul.invite-list { list-style: none; max-height: 200px; overflow-y: auto; }
+    ul.invite-list li { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px; font-weight: 600; }
+    .badge { padding: 4px 8px; border-radius: 10px; font-size: 11px; font-weight: bold; }
+    .paid { background: #dcfce7; color: #15803d; }
+    .pending { background: #fef3c7; color: #b45309; }
+
+    /* FULL SCREEN WHATSAPP STYLE CHATROOM OVERLAY & SIDEBAR */
+    .chatroom-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      background: #e5ddd5;
+      z-index: 2000;
+      display: none;
+      flex-direction: column;
+    }
+    .chatroom-overlay.open {
+      display: flex;
+    }
+
+    /* SIDEBAR STYLES */
+    .chatroom-sidebar-backdrop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.4);
+      z-index: 2100;
+      display: none;
+      backdrop-filter: blur(1px);
+    }
+    .chatroom-sidebar-backdrop.open {
+      display: block;
+    }
+    .chatroom-sidebar {
+      position: absolute;
+      top: 0;
+      left: -280px;
+      width: 280px;
+      height: 100%;
+      background: #ffffff;
+      border-right: 1px solid #e2e8f0;
+      z-index: 2200;
+      display: flex;
+      flex-direction: column;
+      transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 4px 0 20px rgba(0,0,0,0.08);
+    }
+    .chatroom-sidebar.open {
+      left: 0;
+    }
+    .chatroom-sidebar-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 15px;
+      font-weight: 900;
+      color: #0f172a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f8fafc;
+    }
+    .chatroom-sidebar-list {
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .chatroom-sidebar-item {
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #475569;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+    }
+    .chatroom-sidebar-item:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+    .chatroom-sidebar-item.active {
+      background: #eff6ff;
+      color: #0066FF;
+      border-color: #bfdbfe;
+    }
+
+    /* FIXED WHATSAPP STYLE TOPBAR */
+    .chatroom-topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: #0066FF;
+      color: #ffffff;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      z-index: 2050;
+    }
+    .chatroom-topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .back-chat-btn, .menu-chat-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #ffffff;
+      transition: all 0.2s;
+    }
+    .back-chat-btn:hover, .menu-chat-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    .cool-back-arrow {
+      font-size: 18px;
+      font-weight: 900;
+      line-height: 1;
+      font-family: monospace;
+      color: #ffffff;
+    }
+    .menu-hamburger {
+      font-size: 16px;
+      font-weight: 900;
+      line-height: 1;
+      color: #ffffff;
+    }
+    .chatroom-topbar-title {
+      font-size: 15px;
+      font-weight: 900;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #activeRoomTag {
+      font-size: 12px;
+      background: rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-weight: 800;
+    }
+
+    /* FULL SCREEN CHAT MESSAGES BODY */
+    .chatroom-body-content {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      padding-top: 60px;
+      padding-bottom: 70px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .chatroom-card-inner {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+    }
+    .chat-messages-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background-color: #efeae2;
+      background-image: radial-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 0);
+      background-size: 12px 12px;
+    }
+    .chat-msg {
+      display: flex;
+      flex-direction: column;
+      max-width: 75%;
+      align-self: flex-start;
+      background: #ffffff;
+      padding: 8px 12px;
+      border-radius: 0px 12px 12px 12px;
+      font-size: 14px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+      position: relative;
+    }
+    /* YOUR MESSAGES: WHATSAPP GREEN & RIGHT ALIGNED */
+    .chat-msg.self {
+      align-self: flex-end;
+      background: #d9fdd3 !important;
+      color: #0f172a;
+      border-radius: 12px 0px 12px 12px;
+    }
+    .chat-msg .meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      font-size: 11px;
+      font-weight: 800;
+      margin-bottom: 2px;
+      color: #0066FF;
+    }
+    .chat-msg.self .meta { color: #166534 !important; }
+    .chat-msg .text {
+      line-height: 1.4;
+      word-break: break-word;
+      color: #0f172a;
+    }
+
+    /* FIXED WHATSAPP STYLE BOTTOM INPUT BAR */
+    .chat-input-area {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 70px;
+      background: #f0f2f5;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+      z-index: 2050;
+    }
+    .chat-input-area input {
+      flex: 1;
+      height: 44px;
+      padding: 0 16px;
+      border: 1px solid #cbd5e1;
+      border-radius: 22px;
+      font-size: 14px;
+      outline: none;
+      background: #ffffff;
+    }
+    .chat-input-area input:focus {
+      border-color: #0066FF;
+    }
+    .chat-input-area button {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #0066FF;
+      color: #ffffff;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 0;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0,102,255,0.3);
+    }
+    .chat-input-area button:hover {
+      background: #0052cc;
+    }
+
+    /* CUSTOM NOTIFICATION BANNER */
     #customNotification { 
       position: fixed; 
       top: 0; 
@@ -18,7 +513,7 @@
       width: calc(100% - 40px);
       max-width: 380px; 
       margin-top: 14px;
-      background: #2563eb; 
+      background: #0066FF; 
       color: #ffffff; 
       font-size: 13px; 
       font-weight: 800; 
@@ -36,109 +531,44 @@
     #customNotification.error { background: #dc2626; }
     #customNotification.success { background: #16a34a; }
 
-    .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; position: relative; }
-    .badge-live { display: inline-block; background: #dc2626; color: #fff; font-size: 11px; font-weight: bold; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; animation: pulse 1.5s infinite; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
-
-    .user-dropdown { position: relative; display: inline-block; }
-    .user-nickname-btn { background: #f8fafc; color: #1e293b; border: 1px solid #cbd5e1; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-    .user-nickname-btn:hover { background: #e2e8f0; }
-    
-    .dropdown-content { display: none; position: absolute; right: 0; top: 35px; background-color: #ffffff; border: 1px solid #cbd5e1; min-width: 130px; box-shadow: 0px 8px 16px rgba(0,0,0,0.1); border-radius: 8px; z-index: 10; text-align: left; overflow: hidden; }
-    .dropdown-content a { color: #0f172a; padding: 10px 14px; text-decoration: none; display: block; font-size: 13px; font-weight: bold; }
-    .dropdown-content a:hover { background-color: #fee2e2; color: #dc2626; }
-
-    h2 { font-size: 24px; font-weight: 800; color: #15803d; margin-bottom: 8px; }
-    p.fomo-text { font-size: 13px; color: #475569; margin-bottom: 20px; line-height: 1.4; }
-    
-    .stats-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: center; }
-    .stats-box span { font-size: 12px; color: #64748b; text-transform: uppercase; font-weight: 600; display: block; }
-    .stats-box h3 { font-size: 32px; color: #16a34a; font-weight: 800; margin-top: 2px; }
-
-    .hidden-code-container { margin-bottom: 15px; text-align: left; background: #fffbeb; border: 1px dashed #f59e0b; padding: 14px; border-radius: 10px; position: relative; cursor: pointer; }
-    .hidden-code-container label { font-size: 12px; color: #b45309; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 6px; }
-    
-    .blur-wrapper { position: relative; width: 100%; border-radius: 6px; overflow: hidden; background: #e2e8f0; border: 1px solid #cbd5e1; }
-    .blur-target { filter: blur(6px); user-select: none; padding: 12px; font-size: 15px; font-weight: 900; color: #0f172a; letter-spacing: 1px; text-align: center; background: #cbd5e1; pointer-events: none; transition: filter 0.4s ease; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    
-    .blur-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.45); display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; backdrop-filter: blur(1px); transition: 0.2s; }
-    .blur-overlay:hover { background: rgba(15, 23, 42, 0.55); }
-    .blur-overlay span { color: #ffffff; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
-
-    .share-box { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 12px; margin-bottom: 15px; text-align: left; }
-    .share-box label { font-size: 12px; color: #15803d; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 6px; }
-    .share-box textarea { width: 100%; height: 75px; background: #ffffff; border: 1px solid #cbd5e1; color: #0f172a; border-radius: 6px; padding: 8px; font-size: 12px; resize: none; font-family: inherit; margin-bottom: 8px; outline: none; }
-
-    .share-actions { display: flex; gap: 8px; }
-    .share-actions button { flex: 1; margin-bottom: 0; }
-
-    .status-banner { background: #fef3c7; border: 1px solid #fde68a; color: #92400e; padding: 8px 12px; font-size: 12px; border-radius: 6px; font-weight: bold; margin-bottom: 15px; display: block; }
-    .status-banner.active { background: #dcfce7; border-color: #bbf7d0; color: #166534; }
-
-    .btn { background: #16a34a; color: #ffffff; border: none; padding: 14px; font-size: 14px; font-weight: 800; border-radius: 8px; cursor: pointer; width: 100%; margin-bottom: 10px; text-transform: uppercase; transition: 0.2s; line-height: 1.3; }
-    .btn:hover { background: #15803d; }
-    
-    /* Animated Button Style */
-    .btn-animate { animation: unlockGlow 2s infinite; }
-    @keyframes unlockGlow {
-      0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.5); transform: scale(1); }
-      50% { box-shadow: 0 0 15px 5px rgba(22, 163, 74, 0.3); transform: scale(1.02); }
-      100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); transform: scale(1); }
-    }
-
-    .btn-secondary { background: #2563eb; color: #ffffff; }
-    .btn-secondary:hover { background: #1d4ed8; }
-    .btn-share { background: #0284c7; color: #ffffff; }
-    .btn-share:hover { background: #0369a1; }
-
-    .invite-section { margin-top: 20px; text-align: left; }
-    .invite-section h4 { font-size: 14px; color: #64748b; margin-bottom: 10px; text-transform: uppercase; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
-    
-    ul.invite-list { list-style: none; max-height: 180px; overflow-y: auto; }
-    ul.invite-list li { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #e2e8f0; font-size: 13px; font-weight: 500; }
-    
-    .badge { padding: 4px 8px; border-radius: 10px; font-size: 11px; font-weight: bold; }
-    .paid { background: #dcfce7; color: #15803d; }
-    .pending { background: #fef3c7; color: #b45309; }
-
-    /* Modal Styles */
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); display: none; justify-content: center; align-items: center; padding: 20px; z-index: 99; backdrop-filter: blur(2px); }
-    .modal { background: #ffffff; padding: 25px; border-radius: 12px; width: 100%; max-width: 380px; text-align: center; border: 1px solid #cbd5e1; box-shadow: 0 10px 30px rgba(0,0,0,0.15); max-height: 90vh; overflow-y: auto; }
+    /* MODALS */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); display: none; justify-content: center; align-items: center; padding: 20px; z-index: 3000; backdrop-filter: blur(2px); }
+    .modal { background: #ffffff; padding: 25px; border-radius: 16px; width: 100%; max-width: 380px; text-align: center; border: 1px solid #cbd5e1; box-shadow: 0 10px 30px rgba(0,0,0,0.15); max-height: 90vh; overflow-y: auto; }
     .modal h3 { font-size: 18px; color: #0f172a; margin-bottom: 15px; font-weight: 800; }
     .modal p { font-size: 13px; color: #64748b; margin-bottom: 15px; line-height: 1.4; }
-    .modal input { width: 100%; padding: 12px; margin-bottom: 12px; background: #f8fafc; border: 1px solid #cbd5e1; color: #0f172a; border-radius: 6px; font-size: 14px; outline: none; }
-    .modal input:focus { border-color: #16a34a; background: #ffffff; }
-    .close-btn { background: #e2e8f0; color: #334155; margin-top: 5px; }
+    .modal input { width: 100%; padding: 12px; margin-bottom: 12px; background: #f8fafc; border: 1px solid #cbd5e1; color: #0f172a; border-radius: 8px; font-size: 14px; outline: none; }
+    .modal input:focus { border-color: #0066FF; background: #ffffff; }
+    .close-btn { background: #e2e8f0; color: #334155; margin-top: 8px; }
     .close-btn:hover { background: #cbd5e1; }
 
-    /* Paylink Iframe Modal Overrides */
+    /* PAYLINK IFRAME MODAL */
     .paylink-modal { max-width: 500px; padding: 15px; }
     .iframe-wrapper { width: 100%; border-radius: 8px; overflow: hidden; background: #fff; }
     iframe#palpluss-iframe { width: 100%; border: none; min-height: 560px; display: block; transition: height 0.2s ease; }
 
-    /* Receipt UI Card */
-    .receipt-card { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 15px; text-align: left; margin-bottom: 15px; }
+    /* RECEIPT CARD */
+    .receipt-card { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 15px; text-align: left; margin-bottom: 15px; }
     .receipt-card h4 { color: #166534; font-size: 16px; margin-bottom: 10px; text-align: center; }
     .receipt-row { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-bottom: 1px dashed #cbd5e1; }
     .receipt-row span:first-child { color: #64748b; font-weight: 600; }
     .receipt-row span:last-child { color: #0f172a; font-weight: 700; word-break: break-all; }
 
-    /* Loading Screen Overlay */
-    .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; color: white; }
-    .spinner { width: 45px; height: 45px; border: 4px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #16a34a; animation: spin 0.8s linear infinite; margin-bottom: 12px; }
+    /* LOADING SCREEN */
+    .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 4000; color: white; }
+    .spinner { width: 45px; height: 45px; border: 4px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #0066FF; animation: spin 0.8s linear infinite; margin-bottom: 12px; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     .tab-header { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 15px; }
     .tab-btn { flex: 1; padding: 10px; cursor: pointer; color: #64748b; font-weight: bold; font-size: 14px; background: none; border: none; }
-    .tab-btn.active { color: #16a34a; border-bottom: 2px solid #16a34a; }
+    .tab-btn.active { color: #0066FF; border-bottom: 2px solid #0066FF; }
 
     .hidden { display: none !important; }
   </style>
 
-  <!-- Firebase SDKs & Config -->
+  <!-- FIREBASE SDKs & CONFIG -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, set, get, child, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, set, get, child, update, push, onValue, off, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyClYSD9FiNiwjtLsiWG_0xbXGBQUmSxQSA",
@@ -160,77 +590,20 @@
     window.dbGet = get;
     window.dbChild = child;
     window.dbUpdate = update;
+    window.dbPush = push;
+    window.dbOnValue = onValue;
+    window.dbOff = off;
+    window.dbQuery = query;
+    window.dbLimitToLast = limitToLast;
   </script>
 </head>
 <body>
 
-  <!-- Custom Notification Banner FLOATING & COMPACT -->
+  <!-- NOTIFICATION & LOADING OVERLAYS -->
   <div id="customNotification">Notification message here</div>
-
-  <!-- Loading Spinner Screen -->
   <div class="loading-overlay" id="loadingScreen">
     <div class="spinner"></div>
     <p id="loadingText" style="font-weight: bold; font-size: 14px;">Loading...</p>
-  </div>
-
-  <div class="card">
-    <div class="top-header">
-      <span class="badge-live">⚡ MILLIONS CLUB</span>
-      <div id="userProfileNav" class="user-dropdown hidden">
-        <button class="user-nickname-btn" onclick="toggleDropdown()">
-          <span id="navNickname">@User</span> ▾
-        </button>
-        <div id="dropdownMenu" class="dropdown-content">
-          <a href="#" onclick="logout()">Logout</a>
-        </div>
-      </div>
-    </div>
-
-    <h2>OPPORTUNITY TO MAKE MILLIONS FROM SMALL CASH!</h2>
-    <p class="fomo-text">Over <strong>12,000+ Kenyans</strong> are earning weekly! Get your invite link and start growing your Earning network Now!</p>
-
-    <div id="statusBanner" class="status-banner">Status: NOT LOGGED IN</div>
-
-    <div class="stats-box">
-      <span>Total Earned</span>
-      <h3 id="totalEarned">4,000 KSH</h3>
-    </div>
-
-    <div id="hiddenCodeSection" class="hidden-code-container hidden" onclick="handleLockedCodeClick()">
-      <label>Share Your Link and grow your earning network.</label>
-      <div class="blur-wrapper">
-        <div class="blur-target" id="blurredCodeText">https://earn.co.ke/join?ref=LOCKED</div>
-        <div class="blur-overlay">
-          <span>🔒 Your link will appear here !!</span>
-        </div>
-      </div>
-    </div>
-
-    <div id="shareBoxSection" class="share-box hidden">
-      <label>📢 Full Share Message, Link & Code</label>
-      <textarea id="userInviteMessage" readonly></textarea>
-      <div class="share-actions">
-        <button class="btn btn-secondary" style="padding: 10px; font-size: 13px;" onclick="copyInviteMessage()">COPY MESSAGE</button>
-        <button class="btn btn-share" style="padding: 10px; font-size: 13px;" onclick="nativeShareMessage()">SHARE 🚀</button>
-      </div>
-    </div>
-
-    <div id="guestActions">
-      <button class="btn btn-animate" onclick="openAuthModal('signin')">🚀 MAKE MONEY</button>
-    </div>
-
-    <div id="unpaidActions" class="hidden">
-      <button class="btn btn-animate" onclick="openModal('topUpModal')">TAP TO UNLOCK YOUR LINK</button>
-    </div>
-
-    <hr style="margin: 20px 0; border: none; border-top: 1px solid #e2e8f0;" />
-
-    <div class="invite-section">
-      <h4>YOUR NETWORK <span id="networkCountBadge" style="font-size: 12px; background: #e2e8f0; padding: 3px 10px; border-radius: 12px; color: #475569; font-weight: 800;">160 / 309</span></h4>
-      <ul class="invite-list" id="inviteList">
-        <!-- Default demo invites rendered by script -->
-      </ul>
-    </div>
   </div>
 
   <!-- AUTH MODAL -->
@@ -242,21 +615,21 @@
       </div>
 
       <div id="signInForm">
-        <p>Enter your nickname and password to continue.</p>
+        <p>Enter your nickname and password to access Share254.</p>
         <input type="text" id="loginNickname" placeholder="Nickname" />
         <input type="password" id="loginPassword" placeholder="Password" />
         <button class="btn" onclick="completeLogin()">SIGN IN</button>
       </div>
 
       <div id="signUpStep1">
-        <p>Enter Inviter Code first to Continue (e.g., XYZ-1234).</p>
+        <p>Enter Inviter Code first to continue (e.g. SHEA-1001).</p>
         <input type="text" id="inviterCode" placeholder="Enter Inviter Code" />
-        <button class="btn" onclick="verifyInviterCode()">CONTINUE TO REGISTER</button>
+        <button class="btn" onclick="verifyInviterCode()">VERIFY CODE</button>
       </div>
 
       <div id="signUpStep2" class="hidden">
         <p style="color:#16a34a; font-weight:bold;">Inviter Code Verified!</p>
-        <p>Choose your unique nickname and password.</p>
+        <p>Choose your unique Share254 nickname and password.</p>
         <input type="text" id="signUpNickname" placeholder="Choose Nickname" />
         <input type="password" id="signUpPassword" placeholder="Choose Password" />
         <button class="btn" onclick="completeSignUp()">REGISTER NOW</button>
@@ -266,29 +639,15 @@
     </div>
   </div>
 
-  <!-- TOP UP / PRE-PAYMENT CONFIRMATION MODAL -->
-  <div class="modal-overlay" id="topUpModal">
-    <div class="modal">
-      <h3>Unlock Your Income Stream (50 KSH)</h3>
-      <p>Your RICH self is waiting, activate your account now and start collecting 25 KSH per invite!</p>
-      <button class="btn" id="topUpBtn" onclick="openPalplussWidget()">CONTINUE</button>
-      <button class="btn close-btn" onclick="closeModal('topUpModal')">Cancel</button>
-    </div>
-  </div>
-
   <!-- PALPLUSS PAYLINK IFRAME WIDGET MODAL -->
   <div class="modal-overlay" id="palplussPayModal">
     <div class="modal paylink-modal">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-        <h4 style="font-size: 15px; color: #0f172a;">Complete M-Pesa Payment</h4>
+        <h4 style="font-size: 15px; color: #0f172a;">Share254 One-Time Membership</h4>
         <button onclick="closePalplussPayModal(true)" style="background: none; border: none; font-size: 18px; cursor: pointer; color: #64748b;">✕</button>
       </div>
       <div class="iframe-wrapper">
-        <iframe 
-          id="palpluss-iframe" 
-          src="about:blank" 
-          allow="payment">
-        </iframe>
+        <iframe id="palpluss-iframe" src="about:blank" allow="payment"></iframe>
       </div>
     </div>
   </div>
@@ -297,8 +656,8 @@
   <div class="modal-overlay" id="receiptModal">
     <div class="modal">
       <div class="receipt-card">
-        <h4>🎉 Payment Successful!</h4>
-        <p style="text-align: center; font-size: 12px; margin-bottom: 12px; color: #15803d;">Your account is now fully active.</p>
+        <h4>🎉 Membership Activated!</h4>
+        <p style="text-align: center; font-size: 12px; margin-bottom: 12px; color: #15803d;">Your Share254 account is now active for life.</p>
         <div class="receipt-row">
           <span>Ref / TX ID:</span>
           <span id="rcptTxId">---</span>
@@ -316,8 +675,177 @@
     </div>
   </div>
 
+  <!-- FULL SCREEN CHATROOM OVERLAY -->
+  <div class="chatroom-overlay" id="chatroomOverlay">
+    <!-- SIDEBAR BACKDROP & SIDEBAR -->
+    <div class="chatroom-sidebar-backdrop" id="chatSidebarBackdrop" onclick="toggleChatSidebar()"></div>
+    <div class="chatroom-sidebar" id="chatSidebar">
+      <div class="chatroom-sidebar-header">
+        <span>💬 Chat Rooms</span>
+        <button onclick="toggleChatSidebar()" style="background: none; border: none; font-size: 18px; cursor: pointer; color: #64748b;">✕</button>
+      </div>
+      <div class="chatroom-sidebar-list">
+        <div class="chatroom-sidebar-item active" data-room="lounge" onclick="selectChatRoomFromSidebar('lounge', '🔥 Lounge & Gossip', this)">
+          <span>🔥</span> Lounge & Gossip
+        </div>
+        <div class="chatroom-sidebar-item" data-room="flirt" onclick="selectChatRoomFromSidebar('flirt', '💘 Flirt & Chill', this)">
+          <span>💘</span> Flirt & Chill
+        </div>
+        <div class="chatroom-sidebar-item" data-room="hustle" onclick="selectChatRoomFromSidebar('hustle', '💼 Earn & Hustle', this)">
+          <span>💼</span> Earn & Hustle
+        </div>
+        <div class="chatroom-sidebar-item" data-room="random" onclick="selectChatRoomFromSidebar('random', '🎮 Off-Topic / Fun', this)">
+          <span>🎮</span> Off-Topic / Fun
+        </div>
+      </div>
+    </div>
+
+    <!-- FIXED TOPBAR WITH BACK ARROW AND MENU -->
+    <div class="chatroom-topbar">
+      <div class="chatroom-topbar-left">
+        <button class="back-chat-btn" onclick="closeChatroom()" title="Back">
+          <span class="cool-back-arrow">&lt;</span>
+        </button>
+        <button class="menu-chat-btn" onclick="toggleChatSidebar()" title="Toggle Rooms Menu">
+          <span class="menu-hamburger">☰</span>
+        </button>
+      </div>
+      <div class="chatroom-topbar-title">
+        💬 <span id="activeRoomTag">🔥 Lounge & Gossip</span>
+      </div>
+    </div>
+
+    <div class="chatroom-body-content">
+      <div class="chatroom-card-inner">
+        <!-- MESSAGES DISPLAY CONTAINER -->
+        <div class="chat-messages-container" id="chatMessagesContainer">
+          <!-- Messages loaded dynamically -->
+        </div>
+
+        <!-- FIXED CHAT INPUT BAR -->
+        <div class="chat-input-area">
+          <input type="text" id="chatInputMessage" placeholder="Type a message..." onkeydown="handleChatKeyPress(event)" />
+          <button onclick="sendChatMessage()">➤</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="top-navbar">
+    <div class="brand-logo-container">
+      <div class="brand-logo-svg">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+          <defs>
+            <linearGradient id="outerArcGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00C853"/>
+              <stop offset="50%" stop-color="#00B4D8"/>
+              <stop offset="100%" stop-color="#0077B6"/>
+            </linearGradient>
+            <linearGradient id="centerNodeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00E676"/>
+              <stop offset="100%" stop-color="#0091EA"/>
+            </linearGradient>
+          </defs>
+          <g stroke="#8A9BB2" stroke-width="8" stroke-linecap="round" opacity="0.85">
+            <line x1="250" y1="250" x2="160" y2="190" />
+            <line x1="250" y1="250" x2="330" y2="210" />
+            <line x1="250" y1="250" x2="250" y2="335" />
+          </g>
+          <path d="M 230 110 A 140 140 0 1 1 100 270" fill="none" stroke="url(#outerArcGrad)" stroke-width="36" stroke-linecap="round"/>
+          <circle cx="250" cy="250" r="48" fill="url(#centerNodeGrad)"/>
+          <circle cx="250" cy="250" r="16" fill="#FFFFFF"/>
+          <circle cx="150" cy="180" r="28" fill="#0088EC"/>
+          <circle cx="330" cy="210" r="32" fill="#FF6D00"/>
+          <circle cx="250" cy="335" r="28" fill="#00C853"/>
+        </svg>
+      </div>
+      <span class="brand-title-text">Share254</span>
+    </div>
+
+    <div id="userProfileNav" class="user-dropdown hidden">
+      <button class="user-nickname-btn" onclick="toggleDropdown()">
+        <span id="navNickname">@User</span> ▾
+      </button>
+      <div id="dropdownMenu" class="dropdown-content">
+        <a href="#" onclick="logout()">Logout</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="app-container">
+
+    <!-- COLLAPSIBLE HOW IT WORKS CARD WITH TOGGLE BUTTONS -->
+    <div class="header-card-collapsible" id="headerCardCollapsible">
+      <button class="header-card-toggle" onclick="toggleHeaderCardCollapse(event)">
+        <h2>HOW IT WORKS</h2>
+        <div class="dashboard-action-btn" onclick="event.stopPropagation(); openChatroom();">
+          <span class="icon">💬</span>
+          <span class="label">Chatroom</span>
+        </div>
+      </button>
+      <div class="header-card-body">
+        <p class="fomo-text">Join with a <strong>one-time 100 KSH</strong> membership fee. Get a unique code to invite friends, earn <strong>50 KSH</strong> instant commission for every friend you invite!</p>
+        <div class="math-breakdown">
+          <div>10 invites × 50 = <strong>500 KSH</strong></div>
+          <div>50 invites × 50 = <strong>2,500 KSH</strong></div>
+          <div>100 invites × 50 = <strong>5,000 KSH No Limit.</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MEMBERSHIP STATUS -->
+    <div id="statusBanner" class="status-banner">Status: NOT LOGGED IN</div>
+
+    <!-- STATS CARD -->
+    <div class="card stats-box">
+      <span>Total Earned</span>
+      <h3 id="totalEarned">0 KSH</h3>
+    </div>
+
+    <!-- LOCKED LINK SECTION -->
+    <div id="hiddenCodeSection" class="hidden-code-container hidden" onclick="handleLockedCodeClick()">
+      <label>Share Your Link & Grow Your Network</label>
+      <div class="blur-wrapper">
+        <div class="blur-target" id="blurredCodeText">https://share254.app/join?ref=LOCKED</div>
+        <div class="blur-overlay">
+          <span>🔒 your Code will appear Here</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALWAYS VISIBLE UNLOCKED SHARE & COPY CARD -->
+    <div id="shareBoxSection" class="share-box-card hidden">
+      <label>📢 SHARE & EARN CODE</label>
+      <textarea id="userInviteMessage" readonly></textarea>
+      <div class="share-actions">
+        <button class="btn btn-secondary" style="padding: 10px; font-size: 12px;" onclick="copyInviteMessage()">COPY MESSAGE</button>
+        <button class="btn btn-share" style="padding: 10px; font-size: 12px;" onclick="nativeShareMessage()">SHARE 🚀</button>
+      </div>
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    <div id="guestActions">
+      <button class="btn btn-eyecatch btn-highlight-glow" onclick="openAuthModal('signin')">CLICK HERE & GET STARTED</button>
+    </div>
+
+    <div id="unpaidActions" class="hidden">
+      <button class="btn btn-eyecatch btn-green-pay btn-highlight-glow" onclick="openPalplussWidget()">CLICK HERE TO CONTINUE</button>
+    </div>
+
+    <!-- NETWORK INVITES LIST CARD -->
+    <div class="card invite-section">
+      <h4>YOUR INVITES <span id="networkCountBadge" style="font-size: 11px; background: #e2e8f0; padding: 2px 8px; border-radius: 12px; color: #475569; font-weight: 800;">6 / 10</span></h4>
+      <ul class="invite-list" id="inviteList">
+        <!-- Default demo invites rendered by script -->
+      </ul>
+    </div>
+
+  </main>
+
   <script>
-    const PAYLINK_ID = "c8c4a0b3-2835-4435-900d-c43d3b02fd19";
+    const PAYLINK_ID = "3eaff007-b473-4443-84f5-375529c63f9f";
     const PAYLINK_URL = `https://link.palpluss.com/${PAYLINK_ID}?embed=1`;
 
     let currentUser = null; 
@@ -326,7 +854,10 @@
     let isRegistering = false;
     let isProcessingSuccess = false;
 
-    // 10 Default Demo Members (6 paid, 4 pending)
+    // CHAT STATE
+    let currentRoomId = "lounge";
+    let chatListenerUnsub = null;
+
     const defaultDemoInvites = {
       "demo_1": { name: "BrianK", status: "paid" },
       "demo_2": { name: "Sharon_99", status: "paid" },
@@ -340,13 +871,36 @@
       "demo_10": { name: "Vicky_254", status: "pending" }
     };
 
+    function toggleHeaderCardCollapse(event) {
+      if (event) event.stopPropagation();
+      const card = document.getElementById('headerCardCollapsible');
+      card.classList.toggle('open');
+    }
+
+    function collapseHeaderCard() {
+      const card = document.getElementById('headerCardCollapsible');
+      if (card && card.classList.contains('open')) {
+        card.classList.remove('open');
+      }
+    }
+
+    document.addEventListener('click', function(e) {
+      const card = document.getElementById('headerCardCollapsible');
+      const actionGrid = e.target.closest('.dashboard-action-btn');
+      if (card && card.classList.contains('open') && !card.contains(e.target) && !actionGrid) {
+        collapseHeaderCard();
+      }
+    });
+
+    window.addEventListener('scroll', function() {
+      collapseHeaderCard();
+    }, { passive: true });
+
     function showNotification(message, type = 'success') {
       const note = document.getElementById('customNotification');
       note.innerText = message;
       note.className = `show ${type}`;
-      setTimeout(() => {
-        note.className = '';
-      }, 3500);
+      setTimeout(() => { note.className = ''; }, 3500);
     }
 
     function showLoading(text = "Loading...") {
@@ -360,8 +914,8 @@
 
     window.addEventListener('DOMContentLoaded', async () => {
       setupPalplussPostMessageListener();
-
-      const savedUid = localStorage.getItem('million_club_uid');
+      
+      const savedUid = localStorage.getItem('share254_app_uid');
       if (savedUid) {
         showLoading("Restoring session...");
         try {
@@ -377,18 +931,20 @@
             };
             await fetchAndRenderUserData();
           } else {
-            localStorage.removeItem('million_club_uid');
-            updateUI(defaultDemoInvites, "160 / 309");
+            localStorage.removeItem('share254_app_uid');
+            updateUI(defaultDemoInvites, "6 / 10");
           }
         } catch (e) {
           console.error(e);
-          updateUI(defaultDemoInvites, "160 / 309");
+          updateUI(defaultDemoInvites, "6 / 10");
         } finally {
           hideLoading();
         }
       } else {
-        updateUI(defaultDemoInvites, "160 / 309");
+        updateUI(defaultDemoInvites, "6 / 10");
       }
+
+      listenToChatRoom(currentRoomId);
     });
 
     function openModal(id) { document.getElementById(id).style.display = 'flex'; }
@@ -403,7 +959,7 @@
     function closePalplussPayModal(cancelledByUser = false) {
       closeModal('palplussPayModal');
       if (cancelledByUser) {
-        showNotification('Payment cancelled by user. Activation required to unlock your link.', 'error');
+        showNotification('Payment cancelled. Activation required to unlock your link.', 'error');
       }
     }
 
@@ -440,18 +996,15 @@
 
     function openPalplussWidget() {
       if (!currentUser) {
-        closeModal('topUpModal');
         openAuthModal('signin');
         return;
       }
 
       if (currentUser.isPaid) {
         showNotification('Your account is already activated!', 'error');
-        closeModal('topUpModal');
         return;
       }
 
-      closeModal('topUpModal');
       const iframe = document.getElementById('palpluss-iframe');
       iframe.src = PAYLINK_URL;
       openModal('palplussPayModal');
@@ -463,14 +1016,12 @@
 
         if (e.data.type === 'RESIZE' && e.data.height) {
           const iframe = document.getElementById('palpluss-iframe');
-          if (iframe) {
-            iframe.style.height = e.data.height + 'px';
-          }
+          if (iframe) iframe.style.height = e.data.height + 'px';
         }
 
         if (e.data.type === 'PAYMENT_CANCELLED' || e.data.type === 'PAYMENT_CANCEL' || e.data.type === 'CANCELLED') {
           closeModal('palplussPayModal');
-          showNotification('Payment cancelled by user. Activation required to unlock your link.', 'error');
+          showNotification('Payment cancelled. Activation required to unlock your link.', 'error');
           return;
         }
 
@@ -515,7 +1066,7 @@
         if (referrerSnap.exists()) {
           const referrerData = referrerSnap.val();
           const currentReferrerBalance = referrerData.balance || 0;
-          const newReferrerBalance = currentReferrerBalance + 25;
+          const newReferrerBalance = currentReferrerBalance + 50;
           await window.dbUpdate(referrerRef, { balance: newReferrerBalance });
         }
 
@@ -525,11 +1076,11 @@
       }
 
       document.getElementById('rcptTxId').innerText = paymentData.txId || 'N/A';
-      document.getElementById('rcptAmount').innerText = paymentData.amount ? `KES ${paymentData.amount}` : 'KES 50';
+      document.getElementById('rcptAmount').innerText = paymentData.amount ? `KES ${paymentData.amount}` : 'KES 100';
       document.getElementById('rcptPhone').innerText = paymentData.phone || 'N/A';
 
       await fetchAndRenderUserData();
-      showNotification('Payment verified! Account Activated.', 'success');
+      showNotification('Payment verified! Share254 Account Activated.', 'success');
       openModal('receiptModal');
     }
 
@@ -547,7 +1098,7 @@
         const codesSnap = await window.dbGet(codesRef);
 
         if (!codesSnap.exists() || codesSnap.val() === null) {
-          const defaultCode = "XYZ-1234";
+          const defaultCode = "SHEA-1001";
           const systemTimestamp = new Date().toISOString();
           await window.dbSet(window.dbRef(db, `codes/${defaultCode}`), {
             ownerUid: "system_admin_default",
@@ -613,10 +1164,10 @@
           }
         }
 
-        const myUniqueCode = `${nickname.toUpperCase()}_VIP`;
+        const myUniqueCode = `SHARE_${nickname.toUpperCase()}`;
         const codeCheckSnap = await window.dbGet(window.dbChild(window.dbRef(db), `codes/${myUniqueCode}`));
         if (codeCheckSnap.exists()) {
-          showNotification('Invite code identity already taken.', 'error');
+          showNotification('Nickname is already taken.', 'error');
           isRegistering = false;
           hideLoading();
           return;
@@ -649,7 +1200,7 @@
         });
 
         closeModal('authModal');
-        showNotification('Registration successful! Logged in.', 'success');
+        showNotification('Registration successful! Welcome to Share254.', 'success');
 
         currentUser = {
           uid: newUserId,
@@ -659,7 +1210,7 @@
           invitedBy: registeredRefererOwnerUid
         };
 
-        localStorage.setItem('million_club_uid', newUserId);
+        localStorage.setItem('share254_app_uid', newUserId);
         await fetchAndRenderUserData();
       } catch (error) {
         console.error(error);
@@ -675,7 +1226,7 @@
       const pass = document.getElementById('loginPassword').value.trim();
 
       if (!nickname || !pass) {
-        showNotification('Please enter your nickname and password', 'error');
+        showNotification('Please enter nickname and password', 'error');
         return;
       }
 
@@ -683,7 +1234,7 @@
       try {
         const usersSnap = await window.dbGet(window.dbRef(window.db, 'users'));
         if (!usersSnap.exists()) {
-          showNotification('No users found.', 'error');
+          showNotification('No accounts found.', 'error');
           hideLoading();
           return;
         }
@@ -713,7 +1264,7 @@
           invitedBy: foundUser.invitedBy || null
         };
 
-        localStorage.setItem('million_club_uid', foundUid);
+        localStorage.setItem('share254_app_uid', foundUid);
         closeModal('authModal');
         showNotification('Signed in successfully!', 'success');
         await fetchAndRenderUserData();
@@ -738,7 +1289,7 @@
         currentUser.invitedBy = userData.invitedBy || null;
 
         const codesSnap = await window.dbGet(window.dbRef(window.db, 'codes'));
-        let myCode = `${currentUser.nickname.toUpperCase()}_VIP`; 
+        let myCode = `SHARE_${currentUser.nickname.toUpperCase()}`; 
         codesSnap.forEach((codeSnap) => {
           if (codeSnap.val().ownerUid === currentUser.uid) {
             myCode = codeSnap.key;
@@ -747,6 +1298,8 @@
         currentUser.myCode = myCode;
 
         updateUI(userData.invites || {});
+        // Refresh chat messages once user identity is verified
+        listenToChatRoom(currentRoomId);
       } catch (error) {
         console.error(error);
       }
@@ -780,7 +1333,7 @@
         unpaidActions.classList.add('hidden');
         hiddenCodeSection.classList.add('hidden');
         shareBoxSection.classList.add('hidden');
-        totalEarned.innerText = "4,000 KSH";
+        totalEarned.innerText = "0 KSH";
       } 
       else if (currentUser && !currentUser.isPaid) {
         navNickname.innerText = `@${currentUser.nickname}`;
@@ -803,7 +1356,7 @@
         hiddenCodeSection.classList.add('hidden'); 
         shareBoxSection.classList.remove('hidden'); 
 
-        inviteMessageInput.value = `Hey, i have some few slots left for an Online gig. You can make even 2500 ksh a day. If you want to check it out. Dont waste time and get started here, \n\nLink: https://millions-club-io.github.io/grow/#\nUse Invite Code: ${currentUser.myCode}`;
+        inviteMessageInput.value = `Join me on Share254 - Connect & Earn!\nOne-time membership fee is 100 KSH and get 50 KSH per invite.\n\nInvite Code: ${currentUser.myCode}`;
         totalEarned.innerText = `${currentUser.balance} KSH`;
       }
 
@@ -827,18 +1380,176 @@
       }
     }
 
+    /* --- CHATROOM LOGIC & SIDEBAR --- */
+
+    function openChatroom() {
+      if (!currentUser) {
+        showNotification('Please sign in to access Chatrooms!', 'error');
+        openAuthModal('signin');
+        return;
+      }
+
+      if (!currentUser.isPaid) {
+        showNotification('Chat is locked! Account activation (100 KSH) required.', 'error');
+        openPalplussWidget();
+        return;
+      }
+
+      document.getElementById('chatroomOverlay').classList.add('open');
+      const container = document.getElementById('chatMessagesContainer');
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function closeChatroom() {
+      document.getElementById('chatroomOverlay').classList.remove('open');
+      const sidebar = document.getElementById('chatSidebar');
+      const backdrop = document.getElementById('chatSidebarBackdrop');
+      if (sidebar) sidebar.classList.remove('open');
+      if (backdrop) backdrop.classList.remove('open');
+    }
+
+    function toggleChatSidebar() {
+      const sidebar = document.getElementById('chatSidebar');
+      const backdrop = document.getElementById('chatSidebarBackdrop');
+      sidebar.classList.toggle('open');
+      backdrop.classList.toggle('open');
+    }
+
+    function selectChatRoomFromSidebar(roomId, roomTitle, el) {
+      document.querySelectorAll('.chatroom-sidebar-item').forEach(item => item.classList.remove('active'));
+      if (el) el.classList.add('active');
+
+      switchChatRoom(roomId, roomTitle, null);
+      toggleChatSidebar();
+    }
+
+    function switchChatRoom(roomId, roomTitle, el) {
+      document.querySelectorAll('.chatroom-sidebar-item').forEach(item => {
+        if (item.getAttribute('data-room') === roomId) {
+          item.classList.add('active');
+        } else {
+          item.classList.remove('active');
+        }
+      });
+
+      document.getElementById('activeRoomTag').innerText = roomTitle;
+
+      currentRoomId = roomId;
+      listenToChatRoom(roomId);
+    }
+
+    function listenToChatRoom(roomId) {
+      const container = document.getElementById('chatMessagesContainer');
+      container.innerHTML = '<p style="text-align:center; font-size:12px; color:#94a3b8; margin-top:20px;">Loading room chat...</p>';
+
+      if (chatListenerUnsub) {
+        window.dbOff(chatListenerUnsub);
+      }
+
+      const roomRef = window.dbQuery(
+        window.dbRef(window.db, `chatrooms/${roomId}`),
+        window.dbLimitToLast(40)
+      );
+
+      chatListenerUnsub = roomRef;
+
+      window.dbOnValue(roomRef, (snapshot) => {
+        container.innerHTML = "";
+        if (!snapshot.exists()) {
+          container.innerHTML = '<p style="text-align:center; font-size:12px; color:#94a3b8; margin-top:20px;">No messages here yet. Say hi 👋</p>';
+          return;
+        }
+
+        const messages = snapshot.val();
+        Object.keys(messages).forEach((key) => {
+          const msg = messages[key];
+          
+          // Strict user identity comparison for initial load & refresh
+          const isSelf = currentUser && (
+            (msg.senderUid && msg.senderUid === currentUser.uid) ||
+            (msg.sender && currentUser.nickname && msg.sender.toLowerCase() === currentUser.nickname.toLowerCase())
+          );
+
+          const timeStr = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+
+          const msgDiv = document.createElement('div');
+          msgDiv.className = `chat-msg ${isSelf ? 'self' : ''}`;
+          msgDiv.innerHTML = `
+            <div class="meta">
+              <span>@${escapeHtml(msg.sender || 'Anonymous')}</span>
+              <span>${timeStr}</span>
+            </div>
+            <div class="text">${escapeHtml(msg.text || '')}</div>
+          `;
+          container.appendChild(msgDiv);
+        });
+
+        container.scrollTop = container.scrollHeight;
+      });
+    }
+
+    async function sendChatMessage() {
+      if (!currentUser) {
+        showNotification('Please sign in to send messages!', 'error');
+        openAuthModal('signin');
+        return;
+      }
+
+      if (!currentUser.isPaid) {
+        showNotification('Please activate your account (100 KSH) to chat in public rooms!', 'error');
+        openPalplussWidget();
+        return;
+      }
+
+      const input = document.getElementById('chatInputMessage');
+      const text = input.value.trim();
+      if (!text) return;
+
+      input.value = "";
+
+      try {
+        const roomRef = window.dbRef(window.db, `chatrooms/${currentRoomId}`);
+        const newMsgRef = window.dbPush(roomRef);
+        await window.dbSet(newMsgRef, {
+          sender: currentUser.nickname,
+          senderUid: currentUser.uid,
+          text: text,
+          timestamp: Date.now()
+        });
+      } catch (e) {
+        console.error("Failed to send chat message", e);
+        showNotification('Failed to send message.', 'error');
+      }
+    }
+
+    function handleChatKeyPress(e) {
+      if (e.key === 'Enter') {
+        sendChatMessage();
+      }
+    }
+
+    function escapeHtml(text) {
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
     function handleLockedCodeClick() {
       if (!currentUser) openAuthModal('signin');
-      else if (!currentUser.isPaid) openModal('topUpModal');
+      else if (!currentUser.isPaid) openPalplussWidget();
     }
 
     function logout() {
       showLoading("Signing out...");
       setTimeout(() => {
         currentUser = null;
-        localStorage.removeItem('million_club_uid');
+        localStorage.removeItem('share254_app_uid');
         document.getElementById('dropdownMenu').style.display = 'none';
-        updateUI(defaultDemoInvites, "160 / 309");
+        updateUI(defaultDemoInvites, "6 / 10");
+        listenToChatRoom(currentRoomId);
         hideLoading();
         showNotification('Signed out successfully.', 'success');
         openAuthModal('signin');
@@ -849,7 +1560,7 @@
       const messageInput = document.getElementById('userInviteMessage');
       messageInput.select();
       document.execCommand('copy');
-      showNotification('Copied message to clipboard!', 'success');
+      showNotification('Copied invite message to clipboard!', 'success');
     }
 
     async function nativeShareMessage() {
@@ -857,7 +1568,7 @@
       if (navigator.share) {
         try {
           await navigator.share({
-            title: 'Millions Club Invitation',
+            title: 'Share254 Invitation',
             text: messageText
           });
           showNotification('Shared successfully!', 'success');
