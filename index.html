@@ -801,14 +801,14 @@
     <!-- STATS CARD -->
     <div class="card stats-box">
       <span>Total Earned</span>
-      <h3 id="totalEarned">0 KSH</h3>
+      <h3 id="totalEarned">300 KSH</h3>
     </div>
 
     <!-- LOCKED LINK SECTION -->
     <div id="hiddenCodeSection" class="hidden-code-container hidden" onclick="handleLockedCodeClick()">
       <label>Share Your Link & Grow Your Network</label>
       <div class="blur-wrapper">
-        <div class="blur-target" id="blurredCodeText">https://share254.app/join?ref=LOCKED</div>
+        <div class="blur-target" id="blurredCodeText">https://share-254.github.io/grow/</div>
         <div class="blur-overlay">
           <span>🔒 your Code will appear Here</span>
         </div>
@@ -926,7 +926,7 @@
               uid: savedUid,
               nickname: userData.nickname,
               isPaid: userData.isPaid,
-              balance: userData.balance || 0,
+              balance: userData.balance !== undefined ? userData.balance : 300,
               invitedBy: userData.invitedBy || null
             };
             await fetchAndRenderUserData();
@@ -1065,7 +1065,7 @@
 
         if (referrerSnap.exists()) {
           const referrerData = referrerSnap.val();
-          const currentReferrerBalance = referrerData.balance || 0;
+          const currentReferrerBalance = referrerData.balance !== undefined ? referrerData.balance : 300;
           const newReferrerBalance = currentReferrerBalance + 50;
           await window.dbUpdate(referrerRef, { balance: newReferrerBalance });
         }
@@ -1182,7 +1182,7 @@
           password: pass,
           time: timestamp,
           isPaid: false,
-          balance: 0,
+          balance: 300,
           invitedBy: registeredRefererOwnerUid
         });
 
@@ -1206,7 +1206,7 @@
           uid: newUserId,
           nickname: nickname,
           isPaid: false,
-          balance: 0,
+          balance: 300,
           invitedBy: registeredRefererOwnerUid
         };
 
@@ -1260,7 +1260,7 @@
           uid: foundUid,
           nickname: foundUser.nickname,
           isPaid: foundUser.isPaid,
-          balance: foundUser.balance || 0,
+          balance: foundUser.balance !== undefined ? foundUser.balance : 300,
           invitedBy: foundUser.invitedBy || null
         };
 
@@ -1285,7 +1285,7 @@
         const userData = userSnap.val();
 
         currentUser.isPaid = userData.isPaid;
-        currentUser.balance = userData.balance || 0;
+        currentUser.balance = userData.balance !== undefined ? userData.balance : 300;
         currentUser.invitedBy = userData.invitedBy || null;
 
         const codesSnap = await window.dbGet(window.dbRef(window.db, 'codes'));
@@ -1333,7 +1333,7 @@
         unpaidActions.classList.add('hidden');
         hiddenCodeSection.classList.add('hidden');
         shareBoxSection.classList.add('hidden');
-        totalEarned.innerText = "0 KSH";
+        totalEarned.innerText = "300 KSH";
       } 
       else if (currentUser && !currentUser.isPaid) {
         navNickname.innerText = `@${currentUser.nickname}`;
@@ -1356,7 +1356,7 @@
         hiddenCodeSection.classList.add('hidden'); 
         shareBoxSection.classList.remove('hidden'); 
 
-        inviteMessageInput.value = `Join me on Share254 - Connect & Earn!\nOne-time membership fee is 100 KSH and get 50 KSH per invite.\n\nInvite Code: ${currentUser.myCode}`;
+        inviteMessageInput.value = `Dont Stay Broke, try Shear254.\n\nlink: https://share-254.github.io/grow/\nInvite code: ${currentUser.myCode}`;
         totalEarned.innerText = `${currentUser.balance} KSH`;
       }
 
