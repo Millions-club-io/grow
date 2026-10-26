@@ -137,7 +137,7 @@
         </div>
     </div>
 
-    <!-- Sub-Bar Directly Below Top Bar (Responsive Goldish Banner for Mobile & Desktop) -->
+    <!-- Sub-Bar Directly Below Top Bar -->
     <div class="bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 border-b border-amber-600 px-3 sm:px-6 py-2 flex items-center justify-between z-30 shrink-0 text-xs sm:text-sm shadow-md">
         <div class="flex items-center justify-between max-w-7xl mx-auto w-full gap-2 px-1">
             <!-- Responsive Gold Badge Section -->
@@ -150,7 +150,6 @@
                 </div>
             </div>
             
-            <!-- Tagline banner center on larger screens -->
             <div class="hidden md:block text-xs font-bold text-amber-950 tracking-wider uppercase bg-amber-200/60 px-3 py-1 rounded-full border border-amber-400/50 shadow-sm">
                 ✨ Own a piece of internet history ✨
             </div>
@@ -164,10 +163,9 @@
 
     <!-- Billboard Filling Remaining Body Height with Margins -->
     <main class="flex-1 w-full bg-slate-100 p-3 sm:p-6 overflow-y-auto flex flex-col relative pb-24 items-center">
-        <!-- Framed Pixel Grid Container starting Top-Left and Extending Downward -->
         <div class="max-w-6xl w-full bg-white border border-slate-300 rounded-xl shadow-inner p-3 sm:p-4 overflow-hidden">
             <div id="billboardGrid" class="billboard-grid-bg flex flex-wrap content-start items-start justify-start w-full gap-0 min-h-[500px]">
-                <!-- Padded Circular Envelopes dynamically injected here starting top-left -->
+                <!-- Padded Circular Envelopes dynamically injected here -->
             </div>
         </div>
 
@@ -179,7 +177,7 @@
         </div>
     </main>
 
-    <!-- Dedicated Fixed Bottom Bar: Wording on Left, Button always on Right -->
+    <!-- Dedicated Fixed Bottom Bar -->
     <div class="fixed bottom-0 left-0 right-0 h-16 bg-white/95 backdrop-blur-md border-t border-slate-200 z-40 px-4 sm:px-6 flex items-center justify-between gap-3 shadow-2xl">
         <div class="text-xs sm:text-sm text-slate-600 font-bold leading-tight truncate">
             Leave your mark <span class="hidden xs:inline">permanently</span> on the wall.
@@ -224,14 +222,13 @@
                         oninput="calculateCost()">
                 </div>
 
-                <!-- Interactive Color Spectrum Slider (Brown -> Yellow -> Pale Green -> Red) -->
+                <!-- Interactive Color Spectrum Slider -->
                 <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3 shadow-inner">
                     <div class="flex justify-between items-center text-xs">
                         <span class="font-bold text-slate-700 uppercase tracking-wider">Length Color Spectrum</span>
                         <span id="spectrumLabel" class="font-bold px-2.5 py-0.5 rounded-md text-white bg-amber-900">Brown (Short)</span>
                     </div>
 
-                    <!-- Visual Slider Indicator Bar -->
                     <div class="relative pt-1">
                         <input type="range" id="colorSlider" min="0" max="1000" value="0" disabled class="color-spectrum-slider">
                         <div class="flex justify-between text-[10px] font-bold text-slate-500 mt-1.5 px-0.5">
@@ -267,53 +264,44 @@
         </div>
     </div>
 
-    <!-- Phone Number Prompt Popup Modal -->
+    <!-- Phone Number & Payment Iframe Modal Popup -->
     <div id="phoneModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-        <div class="bg-white border border-slate-200 rounded-2xl max-w-sm w-full p-6 shadow-2xl relative animate-in zoom-in-95 duration-150 space-y-4">
-            <button onclick="closePhoneModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-lg font-bold transition">✕</button>
+        <div class="bg-white border border-slate-200 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative animate-in zoom-in-95 duration-150 space-y-4">
+            <button onclick="closePhoneModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-lg font-bold transition z-10">✕</button>
 
-            <div>
+            <div id="phonePromptStep">
                 <h3 class="text-base font-bold text-slate-900">Enter M-PESA Number</h3>
-                <p class="text-xs text-slate-500 mt-0.5">Required to trigger the payment prompt.</p>
-            </div>
+                <p class="text-xs text-slate-500 mt-0.5">We will launch the secure payment widget for this number.</p>
+                
+                <div class="space-y-3 mt-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Phone Number</label>
+                        <input type="tel" id="promptPhoneInput" placeholder="0712345678" 
+                            class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-amber-500 shadow-inner font-bold tracking-wide">
+                    </div>
 
-            <div class="space-y-3">
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Phone Number</label>
-                    <input type="tel" id="promptPhoneInput" placeholder="0712345678" 
-                        class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-amber-500 shadow-inner font-bold tracking-wide">
+                    <button onclick="launchPaymentIframe()" class="w-full bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition active:scale-95 text-sm">
+                        Continue to Payment 🚀
+                    </button>
                 </div>
+            </div>
 
-                <button onclick="confirmAndLaunchWidget()" class="w-full bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition active:scale-95 text-sm">
-                    Proceed to Widget 🚀
-                </button>
+            <!-- Iframe Container that loads dynamically using pure JS -->
+            <div id="iframeWidgetContainer" class="hidden space-y-3">
+                <h3 class="text-base font-bold text-slate-900">Complete Payment</h3>
+                <p class="text-xs text-slate-500">Complete your payment in the secure widget below:</p>
+                <div class="w-full rounded-xl overflow-hidden border border-slate-200 bg-white">
+                    <iframe id="palpluss-pay-frame" style="width: 100%; border: none; min-height: 520px; display: block;" allow="payment"></iframe>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Palpluss Widget Iframe Modal -->
-    <div id="widgetModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden">
-        <div class="bg-white border border-slate-300 rounded-2xl max-w-xl w-full overflow-hidden shadow-2xl relative flex flex-col max-h-[90vh]">
-            <!-- Header bar with close button -->
-            <div class="bg-slate-900 text-white px-4 py-3 flex items-center justify-between shrink-0">
-                <span class="text-xs sm:text-sm font-bold tracking-wide flex items-center gap-2">🔒 Secure M-PESA Checkout</span>
-                <button onclick="closeWidgetModal()" class="text-slate-400 hover:text-white text-lg font-bold transition px-2">✕</button>
-            </div>
-
-            <!-- Iframe container -->
-            <div class="flex-1 w-full bg-slate-50 overflow-y-auto relative">
-                <iframe id="palplussIframe" src="" style="width: 100%; border: none; min-height: 560px; display: block;" allow="payment"></iframe>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Reader for Viewing Envelopes (Book Paper Style Popup) -->
+    <!-- Modal Reader for Viewing Envelopes -->
     <div id="envelopeModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden">
         <div class="book-paper border-2 border-amber-900/20 rounded-xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative animate-in fade-in zoom-in duration-150 my-auto">
-            <!-- Close Button -->
             <button onclick="closeModal()" class="absolute top-4 right-4 text-amber-900/60 hover:text-amber-950 text-xl font-bold transition">✕</button>
             
-            <!-- Header Badge & Title -->
             <div class="flex items-center gap-3 mb-4 border-b border-amber-900/10 pb-4">
                 <div id="modalEnvelopeBadge" class="w-10 h-10 rounded-full flex items-center justify-center text-lg shadow-sm text-white transition-colors duration-300">
                     ✉️
@@ -324,19 +312,16 @@
                 </div>
             </div>
 
-            <!-- Vintage Book Paper Note Container -->
             <div class="my-4 max-h-64 overflow-y-auto px-2">
                 <p id="modalMessage" class="book-paper-font text-xl sm:text-2xl text-amber-950 whitespace-pre-wrap break-words"></p>
             </div>
 
-            <!-- Optional External Link -->
             <div id="modalLinkContainer" class="hidden my-4 pt-2 border-t border-amber-900/10">
                 <a id="modalLinkBtn" href="#" target="_blank" class="flex items-center justify-center gap-2 w-full bg-amber-100/80 border border-amber-300 hover:bg-amber-200 text-amber-900 font-bold text-xs py-2.5 px-4 rounded-xl transition shadow-sm">
                     <span>🔗 Visit Attached Link</span>
                 </a>
             </div>
 
-            <!-- Footer Close Action -->
             <div class="flex justify-end pt-2">
                 <button onclick="closeModal()" class="bg-amber-900 hover:bg-amber-950 text-amber-50 text-xs font-bold py-2 px-5 rounded-lg transition shadow-md">
                     Close Note
@@ -347,13 +332,11 @@
 
     <!-- Application Script -->
     <script>
-        // EXACT PAYLINK ID REQUESTED BY USER
         const PALPLUSS_PAYLINK_ID = '12d1c3b9-3508-44a5-942b-bcc0f326d1fa';
         const AUTOMATIC_CUSTOMER_NAME = 'A Million KSH Letter Wall Supporter';
 
         let pendingFormData = null;
 
-        // Color Spectrum: Brown -> Yellow -> Pale Green -> Red (1,000+ letters)
         function getEnvelopeColor(charCount) {
             if (charCount >= 1000) {
                 return { bg: 'bg-red-700', name: 'Deep Red (1,000+ Letters 🔥)', badgeBg: 'bg-red-700' };
@@ -392,22 +375,34 @@
             updateStats();
             calculateCost();
 
-            // Listen for postMessage events from the raw iframe widget
-            window.addEventListener('message', function(e) {
-                if (!e.data || typeof e.data !== 'object') return;
+            document.addEventListener('click', (e) => {
+                const wrapper = document.getElementById('searchBarWrapper');
+                const toggleBtn = document.getElementById('searchToggleBtn');
                 
-                // Optional security check for iframe origin
-                if (e.origin !== 'https://link.palpluss.com') return;
+                if (!wrapper.classList.contains('hidden')) {
+                    const inner = document.getElementById('searchBarInner');
+                    if (!inner.contains(e.target) && !toggleBtn.contains(e.target)) {
+                        closeSearch();
+                    }
+                }
+            });
 
-                // Auto-resize the iframe height
+            // Listen for postMessage events from the Palpluss Payment Iframe widget
+            window.addEventListener('message', function(e) {
+                if (e.origin !== 'https://link.palpluss.com') return;
+                if (!e.data || typeof e.data !== 'object') return;
+
+                const iframe = document.getElementById('palpluss-pay-frame');
+                if (!iframe) return;
+
+                // Auto-resize handler
                 if (e.data.type === 'RESIZE') {
-                    const iframe = document.getElementById('palplussIframe');
-                    if (iframe) iframe.style.height = e.data.height + 'px';
+                    iframe.style.height = e.data.height + 'px';
                 }
 
-                // Payment successfully completed!
+                // Payment Success handler
                 if (e.data.type === 'PAYMENT_SUCCESS') {
-                    closeWidgetModal();
+                    console.log('Payment confirmed via postMessage:', e.data);
 
                     if (pendingFormData) {
                         const newEnvelope = {
@@ -422,30 +417,17 @@
                         };
 
                         envelopes.unshift(newEnvelope);
-
                         resetSearch();
                         renderBillboard();
                         updateStats();
 
                         document.getElementById('envelopeForm').reset();
                         calculateCost();
-                        closeCreateModal();
-
-                        alert(`🎉 Payment Confirmed! (Ref: ${e.data.txId}). Your envelope is now live on the wall!`);
-                        pendingFormData = null;
                     }
-                }
-            });
 
-            document.addEventListener('click', (e) => {
-                const wrapper = document.getElementById('searchBarWrapper');
-                const toggleBtn = document.getElementById('searchToggleBtn');
-                
-                if (!wrapper.classList.contains('hidden')) {
-                    const inner = document.getElementById('searchBarInner');
-                    if (!inner.contains(e.target) && !toggleBtn.contains(e.target)) {
-                        closeSearch();
-                    }
+                    closePhoneModal();
+                    closeCreateModal();
+                    alert(`🎉 Payment Confirmed! (Ref: ${e.data.txId}). Your envelope is now live on the wall!`);
                 }
             });
         });
@@ -481,16 +463,13 @@
             const linkFee = link.length > 0 ? 20 : 0;
             const totalCost = charCount + linkFee;
 
-            // Update Cost Displays
             document.getElementById('charCostDisplay').textContent = `KSh ${charCount}`;
             document.getElementById('linkCostDisplay').textContent = `KSh ${linkFee}`;
             document.getElementById('totalCostDisplay').textContent = `KSh ${totalCost}`;
 
-            // Sync Interactive Slider Position
             const slider = document.getElementById('colorSlider');
             slider.value = Math.min(charCount, 1000);
 
-            // Update Spectrum Label
             const colorObj = getEnvelopeColor(charCount);
             const spectrumLabel = document.getElementById('spectrumLabel');
 
@@ -563,7 +542,6 @@
             filterEnvelopes();
         }
 
-        // Step 1: User clicks "Pay & Add to Billboard", store form data and prompt for phone number
         function handleFormSubmit(e) {
             e.preventDefault();
             
@@ -579,18 +557,21 @@
 
             pendingFormData = { title, message, link, charCount, totalCost };
 
-            // Open phone number input popup modal
+            // Reset view state in modal and show phone prompt
             document.getElementById('promptPhoneInput').value = '';
+            document.getElementById('phonePromptStep').classList.remove('hidden');
+            document.getElementById('iframeWidgetContainer').classList.add('hidden');
             document.getElementById('phoneModal').classList.remove('hidden');
             document.getElementById('promptPhoneInput').focus();
         }
 
         function closePhoneModal() {
             document.getElementById('phoneModal').classList.add('hidden');
+            document.getElementById('palpluss-pay-frame').src = ''; // Clear iframe source on close
         }
 
-        // Step 2: After entering phone number, open the Palpluss iframe widget with pre-filled parameters
-        function confirmAndLaunchWidget() {
+        // Dynamically build and load the iframe widget using pure JS URLSearchParams
+        function launchPaymentIframe() {
             const phone = document.getElementById('promptPhoneInput').value.trim();
             if (!phone) {
                 alert("Please enter your M-PESA phone number.");
@@ -600,21 +581,22 @@
 
             if (!pendingFormData) return;
 
-            closePhoneModal();
+            // Build dynamic iframe query parameters
+            const params = new URLSearchParams({
+                embed: '1',
+                amount: pendingFormData.totalCost,
+                phone: phone,
+                customer_name: AUTOMATIC_CUSTOMER_NAME
+            });
 
-            // Construct iframe URL with embed=1, amount, phone, and automated name
-            const iframeUrl = `https://link.palpluss.com/${PALPLUSS_PAYLINK_ID}?embed=1&amount=${pendingFormData.totalCost}&phone=${encodeURIComponent(phone)}&customer_name=${encodeURIComponent(AUTOMATIC_CUSTOMER_NAME)}`;
+            const iframeSrc = `https://link.palpluss.com/${PALPLUSS_PAYLINK_ID}?${params.toString()}`;
 
-            // Inject URL into iframe and show widget modal
-            const iframe = document.getElementById('palplussIframe');
-            iframe.src = iframeUrl;
+            // Switch view inside the modal from phone input to the payment iframe
+            document.getElementById('phonePromptStep').classList.add('hidden');
+            document.getElementById('iframeWidgetContainer').classList.remove('hidden');
 
-            document.getElementById('widgetModal').classList.remove('hidden');
-        }
-
-        function closeWidgetModal() {
-            document.getElementById('widgetModal').classList.add('hidden');
-            document.getElementById('palplussIframe').src = '';
+            // Inject the dynamic source URL into the iframe
+            document.getElementById('palpluss-pay-frame').src = iframeSrc;
         }
 
         function openCreateModal() {
