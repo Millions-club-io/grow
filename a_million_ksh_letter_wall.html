@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Million KSH Letter Wall</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Oleo Script, Caveat & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Oleo+Script:wght@400;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+        }
+        .stylish-title {
+            font-family: 'Oleo Script', cursive;
+            text-shadow: 2px 2px 6px rgba(217, 119, 6, 0.25);
+        }
+        /* Book Paper Font for the Popup Note */
+        .book-paper-font {
+            font-family: 'Caveat', cursive;
+        }
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Grid Background Pattern (14px x 14px) */
+        .billboard-grid-bg {
+            background-color: #f8fafc;
+            background-image: 
+                linear-gradient(to right, #cbd5e1 1px, transparent 1px),
+                linear-gradient(to bottom, #cbd5e1 1px, transparent 1px);
+            background-size: 14px 14px;
+        }
+
+        /* Grid Cell Container */
+        .envelope-cell {
+            width: 14px;
+            height: 14px;
+            min-width: 14px;
+            min-height: 14px;
+            padding: 1.5px;
+            box-sizing: border-box;
+        }
+
+        /* Circular Envelope Box */
+        .envelope-box {
+            width: 100%;
+            height: 100%;
+            border-radius: 50% !important;
+        }
+
+        /* Color Spectrum Slider */
+        .color-spectrum-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 12px;
+            border-radius: 6px;
+            background: linear-gradient(to right, #78350f, #eab308, #86efac, #b91c1c);
+            outline: none;
+            opacity: 0.9;
+        }
+        .color-spectrum-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 2.5px solid #0f172a;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+        .color-spectrum-slider::-moz-range-thumb {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 2.5px solid #0f172a;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        /* Vintage Book Paper Background Styling */
+        .book-paper {
+            background-color: #fdfbf7;
+            background-image: linear-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 100% 28px;
+            line-height: 28px;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 h-screen w-screen flex flex-col overflow-hidden antialiased relative">
+
+    <!-- Top Navigation Bar -->
+    <header class="h-16 bg-white/95 backdrop-blur border-b border-slate-200 px-4 sm:px-6 flex items-center justify-between z-40 shrink-0 gap-2 shadow-sm">
+        <div class="flex items-center gap-2 overflow-hidden">
+            <div>
+                <h1 class="text-base sm:text-2xl font-bold stylish-title bg-gradient-to-r from-amber-600 via-yellow-600 to-amber-700 bg-clip-text text-transparent leading-tight py-0.5 truncate">
+                    A Million KSH letter wall
+                </h1>
+                <p class="text-[10px] sm:text-xs text-amber-800/90 font-bold tracking-wide italic">"Own a piece of internet history" • 1 Char = KSh 1</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <button id="searchToggleBtn" onclick="toggleSearch(event)" title="Search Envelopes" class="p-2 text-slate-600 hover:text-slate-900 transition rounded-lg hover:bg-slate-100 flex items-center gap-1.5 text-xs sm:text-sm font-semibold bg-transparent shrink-0">
+                <span class="text-base sm:text-lg">🔍</span>
+                <span class="hidden xs:inline">Search</span>
+            </button>
+            <button onclick="openDemoPaymentModal()" class="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 font-bold text-xs rounded-lg transition shadow-xs hidden sm:block">
+                ⚡ Test Payment Sandbox
+            </button>
+        </div>
+    </header>
+
+    <!-- Fixed Search Bar Overlay -->
+    <div id="searchBarWrapper" class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 sm:px-6 py-4 shadow-xl hidden transition-all">
+        <div id="searchBarInner" class="max-w-3xl mx-auto relative flex items-center gap-3">
+            <span class="text-slate-400 text-lg">🔍</span>
+            <input type="text" id="searchInput" oninput="filterEnvelopes()" placeholder="Search titles, messages, links, or emojis..." 
+                class="w-full bg-slate-100 border border-slate-300 rounded-xl py-3 pl-4 pr-12 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 shadow-inner font-medium">
+            <button onclick="resetSearch()" class="absolute right-16 text-sm text-slate-500 hover:text-slate-900 px-2.5 py-1 rounded-md bg-slate-200 hidden" id="clearSearchBtn">✕</button>
+            <button onclick="closeSearch()" class="px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 text-sm font-bold rounded-xl transition">Close</button>
+        </div>
+    </div>
+
+    <!-- Gold Stats Sub-Bar -->
+    <div class="bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 border-b border-amber-600 px-3 sm:px-6 py-2 flex items-center justify-between z-30 shrink-0 text-xs sm:text-sm shadow-md">
+        <div class="flex items-center justify-between max-w-7xl mx-auto w-full gap-2 px-1">
+            <div class="flex items-center gap-1.5 sm:gap-2.5 bg-amber-950/90 text-amber-100 border border-amber-300/40 px-2.5 sm:px-4 py-1 rounded-lg shadow-inner shrink-0">
+                <span class="text-amber-300 uppercase tracking-wider text-[10px] sm:text-xs font-black">🏆 Claimed:</span>
+                <div class="flex items-center font-extrabold text-yellow-300 font-mono text-[11px] sm:text-sm leading-tight">
+                    <span id="statClaimedCurrent">0 /</span>
+                    <span id="statClaimedTotal" class="text-[10px] sm:text-sm text-yellow-400/90 ml-1">1,000,000</span>
+                </div>
+            </div>
+            
+            <div class="hidden md:block text-xs font-bold text-amber-950 tracking-wider uppercase bg-amber-200/60 px-3 py-1 rounded-full border border-amber-400/50 shadow-sm">
+                ✨ Own a permanent spot on the wall ✨
+            </div>
+
+            <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                <span class="text-amber-950 uppercase tracking-wider text-[10px] sm:text-xs font-bold">Letters Posted:</span>
+                <span class="font-extrabold text-amber-950 font-mono text-xs sm:text-sm bg-amber-100/90 px-2 sm:px-2.5 py-0.5 rounded-md border border-amber-300" id="statEnvelopes">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Billboard Area -->
+    <main class="flex-1 w-full bg-slate-100 p-3 sm:p-6 overflow-y-auto flex flex-col relative pb-24 items-center">
+        <div class="max-w-6xl w-full bg-white border border-slate-300 rounded-xl shadow-inner p-3 sm:p-4 overflow-hidden">
+            <div id="billboardGrid" class="billboard-grid-bg flex flex-wrap content-start items-start justify-start w-full gap-0 min-h-[500px]">
+                <!-- Circular Envelope Nodes dynamically rendered here -->
+            </div>
+        </div>
+
+        <div id="emptyBillboardState" class="hidden my-auto text-center py-12 px-4">
+            <p class="text-5xl mb-3">📭</p>
+            <p class="text-slate-700 font-semibold text-base">No envelopes match your search criteria.</p>
+            <p class="text-sm text-slate-400 mt-1">Try searching another phrase or write a new note!</p>
+        </div>
+    </main>
+
+    <!-- Fixed Bottom Bar -->
+    <div class="fixed bottom-0 left-0 right-0 h-16 bg-white/95 backdrop-blur-md border-t border-slate-200 z-40 px-4 sm:px-6 flex items-center justify-between gap-3 shadow-2xl">
+        <div class="text-xs sm:text-sm text-slate-600 font-bold leading-tight truncate">
+            Leave your mark <span class="hidden xs:inline">permanently</span> on the wall.
+        </div>
+        <button onclick="openCreateModal()" class="px-4 sm:px-6 py-2.5 bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-white font-bold rounded-xl shadow-lg shadow-amber-500/30 transition transform active:scale-95 flex items-center justify-center gap-1.5 text-xs sm:text-sm shrink-0">
+            <span class="text-base sm:text-lg font-black">+</span> Create Envelope
+        </button>
+    </div>
+
+    <!-- Create Envelope Modal -->
+    <div id="createModal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto hidden">
+        <div class="bg-white border border-slate-200 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative my-auto space-y-4 max-h-[90vh] overflow-y-auto">
+            <button onclick="closeCreateModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-lg font-bold transition">✕</button>
+
+            <div>
+                <h2 class="text-lg font-bold text-slate-900 tracking-tight">Create New Envelope</h2>
+                <p class="text-xs text-amber-700 font-bold mt-0.5">✨ Own a piece of internet history • 1 Char = KSh 1</p>
+            </div>
+
+            <form id="envelopeForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Title / Header</label>
+                    <input type="text" id="titleInput" required maxlength="1200" placeholder="e.g. Happy Birthday Mary! 🎉" 
+                        class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-amber-500 shadow-inner font-medium"
+                        oninput="calculateCost()">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Your Message (Supports Emojis)</label>
+                    <textarea id="messageInput" required rows="4" maxlength="2000" placeholder="Write your permanent note here... 🚀❤️✨" 
+                        class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3.5 text-sm text-slate-900 focus:outline-none focus:border-amber-500 resize-none shadow-inner font-medium"
+                        oninput="calculateCost()"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">🔗 Website / Social Link (Optional — +KSh 20)</label>
+                    <input type="url" id="linkInput" placeholder="https://yourwebsite.com" 
+                        class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-amber-500 shadow-inner font-medium"
+                        oninput="calculateCost()">
+                </div>
+
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3 shadow-inner">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="font-bold text-slate-700 uppercase tracking-wider">Length Color Spectrum</span>
+                        <span id="spectrumLabel" class="font-bold px-2.5 py-0.5 rounded-md text-white bg-amber-900">Brown (Short)</span>
+                    </div>
+
+                    <div class="relative pt-1">
+                        <input type="range" id="colorSlider" min="0" max="1000" value="0" disabled class="color-spectrum-slider">
+                        <div class="flex justify-between text-[10px] font-bold text-slate-500 mt-1.5 px-0.5">
+                            <span class="text-amber-900">Brown (0)</span>
+                            <span class="text-yellow-600">Yellow (300)</span>
+                            <span class="text-emerald-600">Pale Green (600)</span>
+                            <span class="text-red-700">Red (1000+)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2 text-sm shadow-inner">
+                    <div class="flex justify-between text-slate-600 font-medium">
+                        <span>Characters Cost:</span>
+                        <span id="charCostDisplay" class="font-mono text-slate-800 font-bold">KSh 0</span>
+                    </div>
+                    <div class="flex justify-between text-slate-600 font-medium">
+                        <span>Link Fee:</span>
+                        <span id="linkCostDisplay" class="font-mono text-slate-800 font-bold">KSh 0</span>
+                    </div>
+                    <div class="border-t border-slate-200 pt-2 flex justify-between items-center">
+                        <span class="text-sm font-bold text-slate-900">Total Cost:</span>
+                        <span id="totalCostDisplay" class="text-lg font-extrabold text-amber-600 font-mono">KSh 0</span>
+                    </div>
+                </div>
+
+                <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-amber-500/20 transition transform active:scale-95 flex items-center justify-center gap-2 text-sm">
+                    <span>📲 Pay & Add to Billboard</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Phone Number & Payment Iframe Modal Popup -->
+    <div id="phoneModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-white border border-slate-200 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative space-y-4">
+            <button onclick="closePhoneModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-lg font-bold transition z-10">✕</button>
+
+            <!-- Step 1: Customer Phone Entry -->
+            <div id="phonePromptStep">
+                <h3 class="text-base font-bold text-slate-900">Enter M-PESA Phone Number</h3>
+                <p class="text-xs text-slate-500 mt-0.5">We will initialize the secure Palpluss browser widget with your details.</p>
+                
+                <div class="space-y-3 mt-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Phone Number</label>
+                        <input type="tel" id="promptPhoneInput" placeholder="0712345678" value="0712345678"
+                            class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-amber-500 shadow-inner font-bold tracking-wide">
+                    </div>
+
+                    <button onclick="launchPaymentIframe()" class="w-full bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition active:scale-95 text-sm">
+                        Continue to Payment Widget 🚀
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Dynamically Populated Raw Palpluss Iframe Container -->
+            <div id="iframeWidgetContainer" class="hidden space-y-3">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900">Palpluss Payment Widget</h3>
+                        <p class="text-xs text-slate-500">Communicating with host via <code class="bg-slate-100 px-1 py-0.5 rounded text-amber-800">window.postMessage</code></p>
+                    </div>
+                    <button onclick="simulatePaymentSuccess()" class="text-[11px] font-bold bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border border-emerald-300 px-2.5 py-1 rounded-lg transition">
+                        ⚡ Simulate Success
+                    </button>
+                </div>
+
+                <div class="w-full rounded-xl overflow-hidden border border-slate-200 bg-slate-50">
+                    <iframe id="palpluss-pay-frame" style="width: 100%; border: none; min-height: 480px; display: block;" allow="payment"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Reader for Viewing Envelopes -->
+    <div id="envelopeModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="book-paper border-2 border-amber-900/20 rounded-xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative my-auto">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-amber-900/60 hover:text-amber-950 text-xl font-bold transition">✕</button>
+            
+            <div class="flex items-center gap-3 mb-4 border-b border-amber-900/10 pb-4">
+                <div id="modalEnvelopeBadge" class="w-10 h-10 rounded-full flex items-center justify-center text-lg shadow-sm text-white transition-colors duration-300">
+                    ✉️
+                </div>
+                <div>
+                    <h3 id="modalTitle" class="text-lg sm:text-xl font-bold text-amber-950 tracking-tight leading-tight"></h3>
+                    <p id="modalMeta" class="text-xs text-amber-900/70 font-semibold font-mono mt-0.5"></p>
+                </div>
+            </div>
+
+            <div class="my-4 max-h-64 overflow-y-auto px-2">
+                <p id="modalMessage" class="book-paper-font text-xl sm:text-2xl text-amber-950 whitespace-pre-wrap break-words"></p>
+            </div>
+
+            <div id="modalLinkContainer" class="hidden my-4 pt-2 border-t border-amber-900/10">
+                <a id="modalLinkBtn" href="#" target="_blank" class="flex items-center justify-center gap-2 w-full bg-amber-100/80 border border-amber-300 hover:bg-amber-200 text-amber-900 font-bold text-xs py-2.5 px-4 rounded-xl transition shadow-sm">
+                    <span>🔗 Visit Attached Link</span>
+                </a>
+            </div>
+
+            <div class="flex justify-end pt-2">
+                <button onclick="closeModal()" class="bg-amber-900 hover:bg-amber-950 text-amber-50 text-xs font-bold py-2 px-5 rounded-lg transition shadow-md">
+                    Close Note
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Logic Script -->
+    <script>
+        const PALPLUSS_PAYLINK_ID = '12d1c3b9-3508-44a5-942b-bcc0f326d1fa';
+        const AUTOMATIC_CUSTOMER_NAME = 'A Million KSH Letter Wall Supporter';
+
+        let pendingFormData = null;
+
+        function getEnvelopeColor(charCount) {
+            if (charCount >= 1000) {
+                return { bg: 'bg-red-700', name: 'Deep Red (1,000+ Letters 🔥)', badgeBg: 'bg-red-700' };
+            } else if (charCount >= 600) {
+                return { bg: 'bg-emerald-400', name: 'Pale Green (600+ Letters)', badgeBg: 'bg-emerald-500' };
+            } else if (charCount >= 300) {
+                return { bg: 'bg-yellow-400', name: 'Bright Yellow (300+ Letters)', badgeBg: 'bg-yellow-500' };
+            } else {
+                return { bg: 'bg-amber-900', name: 'Rich Brown (Short Note)', badgeBg: 'bg-amber-900' };
+            }
+        }
+
+        let envelopes = [
+            {
+                id: 1,
+                title: "Karibu Kenya! 🇰🇪",
+                message: "Welcome to A Million KSH letter wall. Own a piece of internet history!",
+                link: "https://example.com",
+                charCount: 80,
+                totalCost: 100,
+                timestamp: "2026-10-26 10:00"
+            },
+            {
+                id: 2,
+                title: "Call of Duty Squad 🎮",
+                message: "Looking for top COD Mobile players in Nakuru! Hit us up! 🏆🔥 Join our tournament squad for competitive matches across Kenya.",
+                link: "",
+                charCount: 350,
+                totalCost: 350,
+                timestamp: "2026-10-26 11:15"
+            },
+            {
+                id: 3,
+                title: "Tech Innovators 🚀",
+                message: "Building the future of digital payments across Africa. Huge shoutout to all creators and developers building cool products!",
+                link: "https://palpluss.com",
+                charCount: 650,
+                totalCost: 670,
+                timestamp: "2026-10-26 14:20"
+            }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderBillboard();
+            updateStats();
+            calculateCost();
+
+            document.addEventListener('click', (e) => {
+                const wrapper = document.getElementById('searchBarWrapper');
+                const toggleBtn = document.getElementById('searchToggleBtn');
+                
+                if (!wrapper.classList.contains('hidden')) {
+                    const inner = document.getElementById('searchBarInner');
+                    if (!inner.contains(e.target) && !toggleBtn.contains(e.target)) {
+                        closeSearch();
+                    }
+                }
+            });
+
+            // Listen for postMessage events from the Palpluss Payment Iframe widget
+            window.addEventListener('message', function(e) {
+                if (e.origin !== 'https://link.palpluss.com' && e.origin !== window.location.origin) return;
+                if (!e.data || typeof e.data !== 'object') return;
+
+                const iframe = document.getElementById('palpluss-pay-frame');
+                if (!iframe) return;
+
+                // Handle dynamic auto-resize message
+                if (e.data.type === 'RESIZE' && e.data.height) {
+                    iframe.style.height = e.data.height + 'px';
+                }
+
+                // Handle payment success message from iframe
+                if (e.data.type === 'PAYMENT_SUCCESS') {
+                    console.log('Payment confirmed via postMessage:', e.data);
+                    processSuccessfulPayment(e.data.txId || 'TXN_' + Math.random().toString(36).substr(2, 9));
+                }
+            });
+        });
+
+        function toggleSearch(e) {
+            if (e) e.stopPropagation();
+            const wrapper = document.getElementById('searchBarWrapper');
+            const input = document.getElementById('searchInput');
+            if (wrapper.classList.contains('hidden')) {
+                wrapper.classList.remove('hidden');
+                input.focus();
+            } else {
+                closeSearch();
+            }
+        }
+
+        function closeSearch() {
+            const wrapper = document.getElementById('searchBarWrapper');
+            wrapper.classList.add('hidden');
+            resetSearch();
+        }
+
+        function getCharLength(str) {
+            return [...str].length;
+        }
+
+        function calculateCost() {
+            const title = document.getElementById('titleInput').value;
+            const message = document.getElementById('messageInput').value;
+            const link = document.getElementById('linkInput').value.trim();
+
+            const charCount = getCharLength(title) + getCharLength(message);
+            const linkFee = link.length > 0 ? 20 : 0;
+            const totalCost = charCount + linkFee;
+
+            document.getElementById('charCostDisplay').textContent = `KSh ${charCount}`;
+            document.getElementById('linkCostDisplay').textContent = `KSh ${linkFee}`;
+            document.getElementById('totalCostDisplay').textContent = `KSh ${totalCost}`;
+
+            const slider = document.getElementById('colorSlider');
+            slider.value = Math.min(charCount, 1000);
+
+            const colorObj = getEnvelopeColor(charCount);
+            const spectrumLabel = document.getElementById('spectrumLabel');
+
+            spectrumLabel.className = `font-bold px-2.5 py-0.5 rounded-md text-white transition-colors duration-300 ${colorObj.badgeBg}`;
+            spectrumLabel.textContent = colorObj.name.split(' (')[0];
+
+            return { charCount, linkFee, totalCost };
+        }
+
+        function renderBillboard(items = envelopes) {
+            const grid = document.getElementById('billboardGrid');
+            const emptyState = document.getElementById('emptyBillboardState');
+            grid.innerHTML = '';
+
+            if (items.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            items.forEach(env => {
+                const colorObj = getEnvelopeColor(env.charCount);
+                
+                const cell = document.createElement('div');
+                cell.className = `envelope-cell cursor-pointer relative z-10`;
+                cell.onclick = () => openModal(env);
+                cell.title = `${env.title} (${env.charCount} letters)`;
+
+                const box = document.createElement('div');
+                box.className = `envelope-box ${colorObj.bg} hover:scale-150 transition-transform shadow-sm`;
+                
+                cell.appendChild(box);
+                grid.appendChild(cell);
+            });
+        }
+
+        function updateStats() {
+            const totalLetters = envelopes.reduce((acc, curr) => acc + curr.charCount, 0);
+            const totalEnvelopes = envelopes.length;
+
+            document.getElementById('statClaimedCurrent').textContent = `${totalLetters.toLocaleString()} /`;
+            document.getElementById('statClaimedTotal').textContent = `1,000,000`;
+            document.getElementById('statEnvelopes').textContent = totalEnvelopes.toLocaleString();
+        }
+
+        function filterEnvelopes() {
+            const query = document.getElementById('searchInput').value.trim().toLowerCase();
+            const clearBtn = document.getElementById('clearSearchBtn');
+
+            if (query === '') {
+                clearBtn.classList.add('hidden');
+                renderBillboard(envelopes);
+                return;
+            }
+
+            clearBtn.classList.remove('hidden');
+
+            const filtered = envelopes.filter(e => 
+                e.title.toLowerCase().includes(query) || 
+                e.message.toLowerCase().includes(query) ||
+                (e.link && e.link.toLowerCase().includes(query))
+            );
+
+            renderBillboard(filtered);
+        }
+
+        function resetSearch() {
+            document.getElementById('searchInput').value = '';
+            filterEnvelopes();
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('titleInput').value.trim();
+            const message = document.getElementById('messageInput').value.trim();
+            const link = document.getElementById('linkInput').value.trim();
+            const { charCount, totalCost } = calculateCost();
+
+            if (charCount === 0) {
+                alert("Please write a title or message first!");
+                return;
+            }
+
+            pendingFormData = { title, message, link, charCount, totalCost };
+
+            document.getElementById('phonePromptStep').classList.remove('hidden');
+            document.getElementById('iframeWidgetContainer').classList.add('hidden');
+            document.getElementById('phoneModal').classList.remove('hidden');
+            document.getElementById('promptPhoneInput').focus();
+        }
+
+        function closePhoneModal() {
+            document.getElementById('phoneModal').classList.add('hidden');
+            document.getElementById('palpluss-pay-frame').src = '';
+        }
+
+        // Dynamically build and load raw iframe widget using URLSearchParams
+        function launchPaymentIframe() {
+            const phone = document.getElementById('promptPhoneInput').value.trim();
+            if (!phone) {
+                alert("Please enter your M-PESA phone number.");
+                document.getElementById('promptPhoneInput').focus();
+                return;
+            }
+
+            if (!pendingFormData) return;
+
+            const params = new URLSearchParams({
+                embed: '1',
+                amount: pendingFormData.totalCost,
+                phone: phone,
+                customer_name: AUTOMATIC_CUSTOMER_NAME
+            });
+
+            const iframeSrc = `https://link.palpluss.com/${PALPLUSS_PAYLINK_ID}?${params.toString()}`;
+
+            document.getElementById('phonePromptStep').classList.add('hidden');
+            document.getElementById('iframeWidgetContainer').classList.remove('hidden');
+
+            document.getElementById('palpluss-pay-frame').src = iframeSrc;
+        }
+
+        function simulatePaymentSuccess() {
+            window.postMessage({
+                type: 'PAYMENT_SUCCESS',
+                txId: 'SIM_TXN_' + Math.floor(Math.random() * 899999 + 100000),
+                amount: pendingFormData ? pendingFormData.totalCost : 100,
+                phone: '254712345678'
+            }, '*');
+        }
+
+        function processSuccessfulPayment(txId) {
+            if (pendingFormData) {
+                const newEnvelope = {
+                    id: Date.now(),
+                    title: pendingFormData.title,
+                    message: pendingFormData.message,
+                    link: pendingFormData.link,
+                    charCount: pendingFormData.charCount,
+                    totalCost: pendingFormData.totalCost,
+                    txId: txId,
+                    timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16)
+                };
+
+                envelopes.unshift(newEnvelope);
+                resetSearch();
+                renderBillboard();
+                updateStats();
+
+                document.getElementById('envelopeForm').reset();
+                calculateCost();
+            }
+
+            closePhoneModal();
+            closeCreateModal();
+            alert(`🎉 Payment Confirmed! (Transaction Ref: ${txId}). Your envelope is now live on the wall!`);
+        }
+
+        function openDemoPaymentModal() {
+            pendingFormData = {
+                title: "Sandbox Tester 🧪",
+                message: "This note was generated via the Sandbox Payment Simulator!",
+                link: "https://palpluss.com",
+                charCount: 65,
+                totalCost: 85
+            };
+            document.getElementById('phonePromptStep').classList.remove('hidden');
+            document.getElementById('iframeWidgetContainer').classList.add('hidden');
+            document.getElementById('phoneModal').classList.remove('hidden');
+        }
+
+        function openCreateModal() {
+            pendingFormData = null;
+            document.getElementById('createModal').classList.remove('hidden');
+            calculateCost();
+        }
+
+        function closeCreateModal() {
+            document.getElementById('createModal').classList.add('hidden');
+        }
+
+        function openModal(env) {
+            const colorObj = getEnvelopeColor(env.charCount);
+            document.getElementById('modalEnvelopeBadge').className = `w-10 h-10 rounded-full flex items-center justify-center text-lg shadow-sm text-white transition-colors duration-300 ${colorObj.bg}`;
+            document.getElementById('modalTitle').textContent = env.title;
+            document.getElementById('modalMeta').textContent = `${env.charCount} Letters • KSh ${env.totalCost} • ${env.timestamp}`;
+            document.getElementById('modalMessage').textContent = env.message;
+
+            const linkContainer = document.getElementById('modalLinkContainer');
+            const linkBtn = document.getElementById('modalLinkBtn');
+
+            if (env.link && env.link.trim() !== '') {
+                linkBtn.href = env.link;
+                linkContainer.classList.remove('hidden');
+            } else {
+                linkContainer.classList.add('hidden');
+            }
+            
+            document.getElementById('envelopeModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('envelopeModal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
