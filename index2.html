@@ -267,14 +267,14 @@
         </div>
     </div>
 
-    <!-- Phone Number Prompt Modal Popup -->
+    <!-- Phone Number Prompt Popup Modal -->
     <div id="phoneModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden">
         <div class="bg-white border border-slate-200 rounded-2xl max-w-sm w-full p-6 shadow-2xl relative animate-in zoom-in-95 duration-150 space-y-4">
             <button onclick="closePhoneModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-lg font-bold transition">✕</button>
 
             <div>
                 <h3 class="text-base font-bold text-slate-900">Enter M-PESA Number</h3>
-                <p class="text-xs text-slate-500 mt-0.5">We will send the payment prompt to this number.</p>
+                <p class="text-xs text-slate-500 mt-0.5">Required to trigger the payment prompt.</p>
             </div>
 
             <div class="space-y-3">
@@ -285,21 +285,24 @@
                 </div>
 
                 <button onclick="confirmAndLaunchWidget()" class="w-full bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition active:scale-95 text-sm">
-                    Continue to Payment 🚀
+                    Proceed to Widget 🚀
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Raw iframe Palpluss Payment Widget Modal Overlay -->
-    <div id="rawWidgetModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-        <div class="bg-white border border-slate-200 rounded-2xl max-w-xl w-full p-4 shadow-2xl relative animate-in zoom-in-95 duration-150 flex flex-col max-h-[90vh]">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3 px-2">
-                <h3 class="text-sm font-bold text-slate-900">Complete Palpluss M-PESA Payment</h3>
-                <button onclick="closeRawWidgetModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold transition">✕</button>
+    <!-- Palpluss Widget Iframe Modal -->
+    <div id="widgetModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden">
+        <div class="bg-white border border-slate-300 rounded-2xl max-w-xl w-full overflow-hidden shadow-2xl relative flex flex-col max-h-[90vh]">
+            <!-- Header bar with close button -->
+            <div class="bg-slate-900 text-white px-4 py-3 flex items-center justify-between shrink-0">
+                <span class="text-xs sm:text-sm font-bold tracking-wide flex items-center gap-2">🔒 Secure M-PESA Checkout</span>
+                <button onclick="closeWidgetModal()" class="text-slate-400 hover:text-white text-lg font-bold transition px-2">✕</button>
             </div>
-            <div class="flex-1 w-full overflow-y-auto">
-                <iframe id="palpluss-pay-iframe" src="" style="width: 100%; border: none; min-height: 560px; display: block;" allow="payment"></iframe>
+
+            <!-- Iframe container -->
+            <div class="flex-1 w-full bg-slate-50 overflow-y-auto relative">
+                <iframe id="palplussIframe" src="" style="width: 100%; border: none; min-height: 560px; display: block;" allow="payment"></iframe>
             </div>
         </div>
     </div>
@@ -344,7 +347,7 @@
 
     <!-- Application Script -->
     <script>
-        // PALPLUSS PAYLINK ID
+        // EXACT PAYLINK ID REQUESTED BY USER
         const PALPLUSS_PAYLINK_ID = '12d1c3b9-3508-44a5-942b-bcc0f326d1fa';
         const AUTOMATIC_CUSTOMER_NAME = 'A Million KSH Letter Wall Supporter';
 
@@ -389,6 +392,51 @@
             updateStats();
             calculateCost();
 
+            // Listen for postMessage events from the raw iframe widget
+            window.addEventListener('message', function(e) {
+                if (!e.data || typeof e.data !== 'object') return;
+                
+                // Optional security check for iframe origin
+                if (e.origin !== 'https://link.palpluss.com') return;
+
+                // Auto-resize the iframe height
+                if (e.data.type === 'RESIZE') {
+                    const iframe = document.getElementById('palplussIframe');
+                    if (iframe) iframe.style.height = e.data.height + 'px';
+                }
+
+                // Payment successfully completed!
+                if (e.data.type === 'PAYMENT_SUCCESS') {
+                    closeWidgetModal();
+
+                    if (pendingFormData) {
+                        const newEnvelope = {
+                            id: Date.now(),
+                            title: pendingFormData.title,
+                            message: pendingFormData.message,
+                            link: pendingFormData.link,
+                            charCount: pendingFormData.charCount,
+                            totalCost: pendingFormData.totalCost,
+                            txId: e.data.txId,
+                            timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16)
+                        };
+
+                        envelopes.unshift(newEnvelope);
+
+                        resetSearch();
+                        renderBillboard();
+                        updateStats();
+
+                        document.getElementById('envelopeForm').reset();
+                        calculateCost();
+                        closeCreateModal();
+
+                        alert(`🎉 Payment Confirmed! (Ref: ${e.data.txId}). Your envelope is now live on the wall!`);
+                        pendingFormData = null;
+                    }
+                }
+            });
+
             document.addEventListener('click', (e) => {
                 const wrapper = document.getElementById('searchBarWrapper');
                 const toggleBtn = document.getElementById('searchToggleBtn');
@@ -398,33 +446,6 @@
                     if (!inner.contains(e.target) && !toggleBtn.contains(e.target)) {
                         closeSearch();
                     }
-                }
-            });
-
-            // Listen for postMessage events from the Palpluss payment iframe widget
-            window.addEventListener('message', function(e) {
-                if (!e.data || typeof e.data !== 'object') return;
-                
-                // Optional security check for origin
-                if (e.origin !== 'https://link.palpluss.com') return;
-
-                // Auto-resize the iframe height
-                if (e.data.type === 'RESIZE') {
-                    const iframe = document.getElementById('palpluss-pay-iframe');
-                    if (iframe) {
-                        iframe.style.height = e.data.height + 'px';
-                    }
-                }
-
-                // Payment completed successfully!
-                if (e.data.type === 'PAYMENT_SUCCESS') {
-                    console.log('Payment confirmed via iframe postMessage!', e.data);
-                    closeRawWidgetModal();
-                    onPaymentSuccessful({
-                        txId: e.data.txId || 'TXN_' + Math.random().toString(36).substring(2, 10).toUpperCase(),
-                        amount: e.data.amount,
-                        phone: e.data.phone
-                    });
                 }
             });
         });
@@ -542,7 +563,7 @@
             filterEnvelopes();
         }
 
-        // Step 1: Capture form data and open the phone number popup modal
+        // Step 1: User clicks "Pay & Add to Billboard", store form data and prompt for phone number
         function handleFormSubmit(e) {
             e.preventDefault();
             
@@ -558,7 +579,7 @@
 
             pendingFormData = { title, message, link, charCount, totalCost };
 
-            // Open phone number entry modal popup
+            // Open phone number input popup modal
             document.getElementById('promptPhoneInput').value = '';
             document.getElementById('phoneModal').classList.remove('hidden');
             document.getElementById('promptPhoneInput').focus();
@@ -568,12 +589,12 @@
             document.getElementById('phoneModal').classList.add('hidden');
         }
 
-        // Step 2: After user enters phone, build the iframe widget URL with pre-fills and open the widget modal
+        // Step 2: After entering phone number, open the Palpluss iframe widget with pre-filled parameters
         function confirmAndLaunchWidget() {
             const phone = document.getElementById('promptPhoneInput').value.trim();
             if (!phone) {
                 alert("Please enter your M-PESA phone number.");
-                document.getElementById('promptPhoneInput'].focus();
+                document.getElementById('promptPhoneInput').focus();
                 return;
             }
 
@@ -581,47 +602,19 @@
 
             closePhoneModal();
 
-            // Construct iframe URL with embed=1, amount, phone, and encoded customer name
+            // Construct iframe URL with embed=1, amount, phone, and automated name
             const iframeUrl = `https://link.palpluss.com/${PALPLUSS_PAYLINK_ID}?embed=1&amount=${pendingFormData.totalCost}&phone=${encodeURIComponent(phone)}&customer_name=${encodeURIComponent(AUTOMATIC_CUSTOMER_NAME)}`;
 
-            // Set iframe src and open modal
-            const iframe = document.getElementById('palpluss-pay-iframe');
+            // Inject URL into iframe and show widget modal
+            const iframe = document.getElementById('palplussIframe');
             iframe.src = iframeUrl;
-            document.getElementById('rawWidgetModal').classList.remove('hidden');
+
+            document.getElementById('widgetModal').classList.remove('hidden');
         }
 
-        function closeRawWidgetModal() {
-            document.getElementById('rawWidgetModal').classList.add('hidden');
-            document.getElementById('palpluss-pay-iframe').src = '';
-        }
-
-        // Step 3: On successful payment, update billboard and notify user
-        function onPaymentSuccessful(paymentData) {
-            if (!pendingFormData) return;
-
-            const newEnvelope = {
-                id: Date.now(),
-                title: pendingFormData.title,
-                message: pendingFormData.message,
-                link: pendingFormData.link,
-                charCount: pendingFormData.charCount,
-                totalCost: pendingFormData.totalCost,
-                txId: paymentData.txId,
-                timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16)
-            };
-
-            envelopes.unshift(newEnvelope);
-
-            resetSearch();
-            renderBillboard();
-            updateStats();
-
-            document.getElementById('envelopeForm').reset();
-            calculateCost();
-            closeCreateModal();
-            pendingFormData = null;
-
-            alert(`🎉 Payment Confirmed! (Ref: ${paymentData.txId}). Your envelope is now live on the wall!`);
+        function closeWidgetModal() {
+            document.getElementById('widgetModal').classList.add('hidden');
+            document.getElementById('palplussIframe').src = '';
         }
 
         function openCreateModal() {
