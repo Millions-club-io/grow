@@ -10,8 +10,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Oleo+Script:wght@400;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <!-- Palpluss Paylink Widget SDK via CDN -->
-    <script src="https://unpkg.com/@palpluss/paylink@latest/dist/index.umd.js"></script>
     <style>
         body {
             font-family: 'Outfit', sans-serif;
@@ -218,20 +216,6 @@
                         oninput="calculateCost()"></textarea>
                 </div>
 
-                <!-- Customer Phone Input for Palpluss Pre-fill -->
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">📱 M-PESA Phone Number</label>
-                    <input type="tel" id="phoneInput" placeholder="0712345678" 
-                        class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-amber-500 shadow-inner font-medium">
-                </div>
-
-                <!-- Customer Name Input for Palpluss Pre-fill -->
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">👤 Your Name / Note Name</label>
-                    <input type="text" id="customerNameInput" placeholder="Jane Wanjiku" maxlength="120"
-                        class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-amber-500 shadow-inner font-medium">
-                </div>
-
                 <!-- Optional Link Input -->
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">🔗 Website / Social Link (Optional — +KSh 20)</label>
@@ -259,20 +243,6 @@
                     </div>
                 </div>
 
-                <!-- Live Interactive Color Preview Box -->
-                <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 flex items-center justify-between shadow-inner">
-                    <div class="flex items-center gap-3">
-                        <div id="liveColorPreviewBox" class="w-8 h-8 rounded-full bg-amber-900 transition-colors duration-300 shadow-sm border border-slate-300"></div>
-                        <div>
-                            <p class="text-[11px] text-slate-500 uppercase font-semibold tracking-wider">Live Envelope Dot</p>
-                            <p id="liveColorName" class="text-xs font-bold text-slate-800">Brown (Short Note)</p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <span id="liveCharCountBadge" class="text-xs font-mono font-bold bg-amber-100 text-amber-800 px-2.5 py-1 rounded-lg">0 chars</span>
-                    </div>
-                </div>
-
                 <!-- Cost Breakdown Box -->
                 <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2 text-sm shadow-inner">
                     <div class="flex justify-between text-slate-600 font-medium">
@@ -294,6 +264,43 @@
                     <span>📲 Pay & Add to Billboard</span>
                 </button>
             </form>
+        </div>
+    </div>
+
+    <!-- Phone Number Prompt Modal Popup -->
+    <div id="phoneModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-white border border-slate-200 rounded-2xl max-w-sm w-full p-6 shadow-2xl relative animate-in zoom-in-95 duration-150 space-y-4">
+            <button onclick="closePhoneModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-lg font-bold transition">✕</button>
+
+            <div>
+                <h3 class="text-base font-bold text-slate-900">Enter M-PESA Number</h3>
+                <p class="text-xs text-slate-500 mt-0.5">We will send the payment prompt to this number.</p>
+            </div>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Phone Number</label>
+                    <input type="tel" id="promptPhoneInput" placeholder="0712345678" 
+                        class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-amber-500 shadow-inner font-bold tracking-wide">
+                </div>
+
+                <button onclick="confirmAndLaunchWidget()" class="w-full bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition active:scale-95 text-sm">
+                    Continue to Payment 🚀
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Raw iframe Palpluss Payment Widget Modal Overlay -->
+    <div id="rawWidgetModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-white border border-slate-200 rounded-2xl max-w-xl w-full p-4 shadow-2xl relative animate-in zoom-in-95 duration-150 flex flex-col max-h-[90vh]">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3 px-2">
+                <h3 class="text-sm font-bold text-slate-900">Complete Palpluss M-PESA Payment</h3>
+                <button onclick="closeRawWidgetModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold transition">✕</button>
+            </div>
+            <div class="flex-1 w-full overflow-y-auto">
+                <iframe id="palpluss-pay-iframe" src="" style="width: 100%; border: none; min-height: 560px; display: block;" allow="payment"></iframe>
+            </div>
         </div>
     </div>
 
@@ -337,8 +344,11 @@
 
     <!-- Application Script -->
     <script>
-        // REPLACE WITH YOUR ACTUAL PALPLUSS PAYLINK ID GENERATED FROM CONSOLE
-        const PALPLUSS_PAYLINK_ID = '1fbb7b69-ac0e-4439-a08d-40bfd9ee13de';
+        // PALPLUSS PAYLINK ID
+        const PALPLUSS_PAYLINK_ID = '12d1c3b9-3508-44a5-942b-bcc0f326d1fa';
+        const AUTOMATIC_CUSTOMER_NAME = 'A Million KSH Letter Wall Supporter';
+
+        let pendingFormData = null;
 
         // Color Spectrum: Brown -> Yellow -> Pale Green -> Red (1,000+ letters)
         function getEnvelopeColor(charCount) {
@@ -390,6 +400,33 @@
                     }
                 }
             });
+
+            // Listen for postMessage events from the Palpluss payment iframe widget
+            window.addEventListener('message', function(e) {
+                if (!e.data || typeof e.data !== 'object') return;
+                
+                // Optional security check for origin
+                if (e.origin !== 'https://link.palpluss.com') return;
+
+                // Auto-resize the iframe height
+                if (e.data.type === 'RESIZE') {
+                    const iframe = document.getElementById('palpluss-pay-iframe');
+                    if (iframe) {
+                        iframe.style.height = e.data.height + 'px';
+                    }
+                }
+
+                // Payment completed successfully!
+                if (e.data.type === 'PAYMENT_SUCCESS') {
+                    console.log('Payment confirmed via iframe postMessage!', e.data);
+                    closeRawWidgetModal();
+                    onPaymentSuccessful({
+                        txId: e.data.txId || 'TXN_' + Math.random().toString(36).substring(2, 10).toUpperCase(),
+                        amount: e.data.amount,
+                        phone: e.data.phone
+                    });
+                }
+            });
         });
 
         function toggleSearch(e) {
@@ -432,16 +469,9 @@
             const slider = document.getElementById('colorSlider');
             slider.value = Math.min(charCount, 1000);
 
-            // Update Live Color Preview & Spectrum Label
+            // Update Spectrum Label
             const colorObj = getEnvelopeColor(charCount);
-            const previewBox = document.getElementById('liveColorPreviewBox');
-            const previewName = document.getElementById('liveColorName');
-            const charBadge = document.getElementById('liveCharCountBadge');
             const spectrumLabel = document.getElementById('spectrumLabel');
-
-            previewBox.className = `w-8 h-8 rounded-full transition-colors duration-300 shadow-sm border border-slate-300 ${colorObj.bg}`;
-            previewName.textContent = colorObj.name;
-            charBadge.textContent = `${charCount} chars`;
 
             spectrumLabel.className = `font-bold px-2.5 py-0.5 rounded-md text-white transition-colors duration-300 ${colorObj.badgeBg}`;
             spectrumLabel.textContent = colorObj.name.split(' (')[0];
@@ -512,14 +542,12 @@
             filterEnvelopes();
         }
 
-        // Integrated Palpluss Paylink Widget Checkout Handler
-        async function handleFormSubmit(e) {
+        // Step 1: Capture form data and open the phone number popup modal
+        function handleFormSubmit(e) {
             e.preventDefault();
             
             const title = document.getElementById('titleInput').value.trim();
             const message = document.getElementById('messageInput').value.trim();
-            const phone = document.getElementById('phoneInput').value.trim();
-            const customerName = document.getElementById('customerNameInput').value.trim();
             const link = document.getElementById('linkInput').value.trim();
             const { charCount, totalCost } = calculateCost();
 
@@ -528,61 +556,76 @@
                 return;
             }
 
-            // Check if Palpluss pay SDK is loaded
-            if (typeof window.palplussPaylink === 'undefined' && typeof pay === 'undefined') {
-                alert("Payment SDK is loading or unavailable. Please check your connection.");
+            pendingFormData = { title, message, link, charCount, totalCost };
+
+            // Open phone number entry modal popup
+            document.getElementById('promptPhoneInput').value = '';
+            document.getElementById('phoneModal').classList.remove('hidden');
+            document.getElementById('promptPhoneInput').focus();
+        }
+
+        function closePhoneModal() {
+            document.getElementById('phoneModal').classList.add('hidden');
+        }
+
+        // Step 2: After user enters phone, build the iframe widget URL with pre-fills and open the widget modal
+        function confirmAndLaunchWidget() {
+            const phone = document.getElementById('promptPhoneInput').value.trim();
+            if (!phone) {
+                alert("Please enter your M-PESA phone number.");
+                document.getElementById('promptPhoneInput'].focus();
                 return;
             }
 
-            try {
-                // Use the Palpluss paylink widget to handle secure checkout.
-                // Automatically pre-fills the calculated total amount, customer phone, and name.
-                const payFn = window.palplussPaylink ? window.palplussPaylink.pay : pay;
-                
-                const result = await payFn(PALPLUSS_PAYLINK_ID, {
-                    amount: totalCost,
-                    phone: phone,
-                    customerName: customerName || title,
-                    onSuccess: (data) => {
-                        console.log('Payment successful:', data);
-                    },
-                    onClose: () => {
-                        console.log('Payment modal dismissed by user');
-                    }
-                });
+            if (!pendingFormData) return;
 
-                // ONLY executed if payment is successfully completed and confirmed
-                if (result && result.txId) {
-                    const newEnvelope = {
-                        id: Date.now(),
-                        title: title,
-                        message: message,
-                        link: link,
-                        charCount: charCount,
-                        totalCost: totalCost,
-                        txId: result.txId,
-                        timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16)
-                    };
+            closePhoneModal();
 
-                    envelopes.unshift(newEnvelope);
+            // Construct iframe URL with embed=1, amount, phone, and encoded customer name
+            const iframeUrl = `https://link.palpluss.com/${PALPLUSS_PAYLINK_ID}?embed=1&amount=${pendingFormData.totalCost}&phone=${encodeURIComponent(phone)}&customer_name=${encodeURIComponent(AUTOMATIC_CUSTOMER_NAME)}`;
 
-                    resetSearch();
-                    renderBillboard();
-                    updateStats();
+            // Set iframe src and open modal
+            const iframe = document.getElementById('palpluss-pay-iframe');
+            iframe.src = iframeUrl;
+            document.getElementById('rawWidgetModal').classList.remove('hidden');
+        }
 
-                    document.getElementById('envelopeForm').reset();
-                    calculateCost();
-                    closeCreateModal();
+        function closeRawWidgetModal() {
+            document.getElementById('rawWidgetModal').classList.add('hidden');
+            document.getElementById('palpluss-pay-iframe').src = '';
+        }
 
-                    alert(`🎉 Payment Confirmed! (Ref: ${result.txId}). Your envelope is now live on the wall!`);
-                }
-            } catch (err) {
-                // User closed or dismissed the modal without paying
-                console.log('Payment canceled or closed:', err);
-            }
+        // Step 3: On successful payment, update billboard and notify user
+        function onPaymentSuccessful(paymentData) {
+            if (!pendingFormData) return;
+
+            const newEnvelope = {
+                id: Date.now(),
+                title: pendingFormData.title,
+                message: pendingFormData.message,
+                link: pendingFormData.link,
+                charCount: pendingFormData.charCount,
+                totalCost: pendingFormData.totalCost,
+                txId: paymentData.txId,
+                timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16)
+            };
+
+            envelopes.unshift(newEnvelope);
+
+            resetSearch();
+            renderBillboard();
+            updateStats();
+
+            document.getElementById('envelopeForm').reset();
+            calculateCost();
+            closeCreateModal();
+            pendingFormData = null;
+
+            alert(`🎉 Payment Confirmed! (Ref: ${paymentData.txId}). Your envelope is now live on the wall!`);
         }
 
         function openCreateModal() {
+            pendingFormData = null;
             document.getElementById('createModal').classList.remove('hidden');
             calculateCost();
         }
